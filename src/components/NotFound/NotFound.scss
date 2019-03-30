@@ -1,0 +1,32 @@
+@import '../Colors';
+
+.not-found {
+  h1 {
+    font-size: 15rem;
+    @media (max-width: 768px) {
+      font-size: 6rem;
+    }
+  }
+  .page-not-available {
+    margin: 0;
+  }
+  .link-to-home {
+    background-color: $purple;
+    border-radius: .5rem;
+    -moz-border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+    padding: 0.8rem;
+    color: $white;
+    text-decoration: none;
+    transition: all .3s;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    -o-transition: all .3s;
+    display: block;
+    max-width: 10rem;
+    margin: 2rem auto;
+    &:hover {
+      background-color: $purple-light;
+    }
+  }
+}

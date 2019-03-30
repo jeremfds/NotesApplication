@@ -1,10 +1,13 @@
 import React from 'react';
 import { render } from 'react-dom';
 import App from './components/App';
+import { BrowserRouter } from 'react-router-dom';
 //import * as serviceWorker from './serviceWorker';
 
 const app: any = (
-    <App />
+    <BrowserRouter>
+        <App />
+    </BrowserRouter>
 );
 
 render(app, document.getElementById('root'));
