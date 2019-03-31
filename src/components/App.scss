@@ -58,17 +58,44 @@ body {
     background-color: $grey;
   }
   h1 {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: bold;
+    margin: 0;
     @media (max-width: 768px) {
       font-size: 1.2rem;
     }
   }
   h2 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
+    margin: 0;
     @media (max-width: 768px) {
       font-size: 0.95rem;
+    }
+  }
+  .purple-button {
+    background-color: $purple;
+    color: $white;
+    border-radius: .5rem;
+    transition: all .3s;
+    border: none;
+    height: 2.813rem;
+    min-width: 11.25rem;
+    display: block;
+    margin: 2rem auto auto;
+    box-shadow: 0 0.625rem 0.625rem 0 rgba(0, 0, 0, 0.10);
+    &:hover {
+      transform: translateY(-0.0625rem);
+      box-shadow: none;
+      background-color: $purple-light;
+    }
+    &:disabled {
+      background-color: $purple-light;
+      cursor: not-allowed;
+      box-shadow: none;
+      &:hover {
+        transform: translateY(0);
+      }
     }
   }
 }

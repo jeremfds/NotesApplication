@@ -3,26 +3,15 @@
 header {
   background-color: $grey;
   border-bottom: 2px solid $grey-light;
-  padding: 20px;
   .navbar {
-    padding: 0;
+    padding: 1rem;
     .navbar-brand {
       display: flex;
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      display: flex;
-      flex-direction: column;
-      -webkit-flex-direction: column;
       align-items: center;
-      -webkit-align-items: center;
-      margin: auto;
       font-size: 1.2rem;
       color: $purple;
       text-decoration: none;
       transition: all .3s;
-      -webkit-transition: all .3s;
-      -moz-transition: all .3s;
-      -o-transition: all .3s;
       @media (max-width: 768px) {
         font-size: 1rem;
       }
@@ -32,14 +21,65 @@ header {
       img {
         width: 5rem;
         height: 5rem;
-        @media (max-width: 769px) {
+        @media (max-width: 768px) {
           width: 3rem;
           height: 3rem;
         }
       }
       .slogan {
         margin-bottom: 0;
-        margin-top: 0.6rem;
+        margin-left: 1rem;
+      }
+    }
+    .navbar-toggler {
+      border: none;
+      background-color: $purple;
+      padding: 0.0625rem 0.375rem;
+      position: relative;
+      transition: all .3s;
+      .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 1)' stroke-width='1' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+      }
+      &.open {
+        background-color: $purple-light;
+        span {
+          background-image: none;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          &:after, &:before {
+            position: absolute;
+            content: '';
+            height: 1.563rem;
+            width: 0.063rem;
+            background-color: $white;
+          }
+          &:before {
+            transform: rotate(45deg);
+          }
+          &:after {
+            transform: rotate(-45deg);
+          }
+        }
+      }
+    }
+    .nav-item {
+      &:last-child {
+        .nav-link {
+          margin-right: 0;
+        }
+      }
+      .nav-link {
+        color: $purple;
+        transition: all .3s;
+        margin-right: 1.5rem;
+        @media (max-width: 767px) {
+          margin-right: 0;
+        }
+        &:hover {
+          color: $purple-light;
+        }
       }
     }
   }

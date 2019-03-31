@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from 'react';
 import { Container } from 'reactstrap';
 
-class Notes extends Component {
+class ShowNotes extends Component {
     render(): ReactNode {
         return (
             <Container>
@@ -11,4 +11,4 @@ class Notes extends Component {
     }
 }
 
-export default Notes;
+export default ShowNotes;
