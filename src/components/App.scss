@@ -52,6 +52,13 @@ body {
   @media (max-width: 768px) {
     font-size: 0.875rem;
   }
+  .wrap {
+    display: flex;
+    min-height: 100vh;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+  }
   main[role=main] {
     flex: 1;
     padding: 2.5rem 0;
@@ -60,7 +67,7 @@ body {
   h1 {
     font-size: 2rem;
     font-weight: bold;
-    margin: 0;
+    margin-bottom: 2.5rem;
     @media (max-width: 768px) {
       font-size: 1.2rem;
     }
@@ -96,7 +103,6 @@ body {
     margin: 2rem auto auto;
     box-shadow: 0 0.625rem 0.625rem 0 rgba(0, 0, 0, 0.10);
     text-decoration: none;
-
     &:hover {
       transform: translateY(-0.0625rem);
       box-shadow: none;
@@ -114,8 +120,19 @@ body {
   .card {
     border-radius: .5rem;
     padding: 2rem;
-    margin-top: 2.5rem;
     border: 0.063rem solid $grey-light;
     box-shadow: 0 0.625rem 0.625rem 0 rgba(0, 0, 0, 0.02);
+  }
+  .modal {
+    .purple-btn {
+      background-color: $purple;
+      border: none;
+      &:hover {
+        background-color: $purple-light;
+      }
+      &:active {
+        background-color: $purple-light!important;
+      }
+    }
   }
 }

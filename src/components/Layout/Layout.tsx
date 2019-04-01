@@ -1,5 +1,6 @@
 import React, { FunctionComponent, ReactNode } from 'react';
 import Header from '../Shared/Header';
+import Footer from '../Shared/Footer';
 
 interface IProps {
     children: ReactNode;
@@ -12,6 +13,7 @@ const Layout: FunctionComponent<IProps> = ({children}) => {
             <main role="main">
                 {children}
             </main>
+            <Footer />
         </div>
     );
 };

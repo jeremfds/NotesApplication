@@ -58,7 +58,7 @@ class Create extends Component<IProps, IState> {
             if (prevProps.success !== this.props.success) {
                 setTimeout(() =>
                     this.setState({
-                        note: { id: 0, title: '', text: '', type: '', priority: '', date: '' },
+                        note: { id: 0, title: '', text: '', type: '', priority: '', date: noteDate },
                         isLoading: false,
                         isEnabled: false
                 }), 300);

@@ -1,12 +1,15 @@
 import React, { Component, ReactNode } from 'react';
 import { Card, CardHeader, CardBody, CardFooter, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { connect } from 'react-redux';
-import { MNote } from '../../../../models/notes';
-import { IRootState, RTDispatch } from '../../../../roots';
-import { deleteNote, clearDeleteNote } from '../../../../actions/notes/actionDeleteNote';
+import { Link } from 'react-router-dom';
+import { MNote } from '../../../models/notes';
+import { IRootState, RTDispatch } from '../../../roots';
+import { deleteNote, clearDeleteNote } from '../../../actions/notes/actionDeleteNote';
+import './Note.scss';
 
 interface IProps {
     note: MNote;
+    homepage: boolean;
     success?: boolean;
     refreshNotes: (makeRefresh: boolean) => void;
     deleteNote?: (id: number) => void;
@@ -68,7 +71,11 @@ class Note extends Component<IProps, IState> {
                 <CardFooter>
                     <span className={`show-type-name ${note.type.toLowerCase()}`}>{note.type}</span>
                     <div className="note-event">
-                        <div className="icon see"/>
+                        {
+                            this.props.homepage ? (
+                                <Link to={`/show/${note.id}`} title={note.title} className="icon see" />
+                            ) : null
+                        }
                         <div className="icon edit"/>
                         <div className="icon delete" onClick={this.toggleModal} />
                         <Modal isOpen={this.state.modal} toggle={this.toggleModal}>

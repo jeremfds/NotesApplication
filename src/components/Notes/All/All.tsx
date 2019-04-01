@@ -5,8 +5,7 @@ import { Link } from 'react-router-dom';
 import { clearGetNotes, getNotes } from '../../../actions/notes/actionGetNotes';
 import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
-import Note from './Note';
-import './All.scss';
+import Note from '../Note';
 
 interface IProps {
     notes: MNote[];
@@ -55,6 +54,10 @@ class All extends Component<IProps, IState> {
         }
     }
 
+    componentWillUnmount(): void {
+        this.props.clearGetNotes();
+    }
+
     refreshNotes(makeRefresh: boolean): void {
         this.setState({refreshNotes: makeRefresh, isLoading: true});
     }
@@ -64,7 +67,7 @@ class All extends Component<IProps, IState> {
 
         if (this.state.isLoading) {
             return (
-                <Container className="create-note">
+                <Container>
                     <Row>
                         <Col>
                             <Spinner />
@@ -76,10 +79,12 @@ class All extends Component<IProps, IState> {
 
         if (this.props.notCompatible) {
             return (
-                <Container className="create-note">
+                <Container>
                     <Row>
                         <Col>
-                            <p>Your browser is not compatible with the localStorage technology.</p>
+                            <p className="text-center">
+                                Your browser is not compatible with the localStorage technology.
+                            </p>
                         </Col>
                     </Row>
                 </Container>
@@ -88,7 +93,7 @@ class All extends Component<IProps, IState> {
 
         if (Array.empty(notes)) {
             return (
-                <Container className="my-notes">
+                <Container>
                     <Row>
                         <Col xs={12} sm={{ size: 8, offset: 2 }}>
                             <div className="text-center welcome">
@@ -108,14 +113,14 @@ class All extends Component<IProps, IState> {
         }
 
         return (
-            <Container className="my-notes">
+            <Container>
                 <Row>
                     <Col xs={12} sm={{ size: 8, offset: 2 }}>
                         <h1>My notes</h1>
                         {
                             notes.map((note: MNote, index: number) => {
                                return (
-                                   <Note key={index} note={note} refreshNotes={this.refreshNotes} />
+                                   <Note key={index} note={note} homepage={true} refreshNotes={this.refreshNotes} />
                                )
                             })
                         }
