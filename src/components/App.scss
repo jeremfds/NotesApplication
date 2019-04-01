@@ -73,17 +73,30 @@ body {
       font-size: 0.95rem;
     }
   }
+  .spinner-border {
+    display: block;
+    margin: auto;
+    color: $purple;
+  }
+  a {
+    outline-color: transparent;
+    outline-style: none;
+  }
   .purple-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: $purple;
     color: $white;
     border-radius: .5rem;
     transition: all .3s;
     border: none;
     height: 2.813rem;
-    min-width: 11.25rem;
-    display: block;
+    width: 11.25rem;
     margin: 2rem auto auto;
     box-shadow: 0 0.625rem 0.625rem 0 rgba(0, 0, 0, 0.10);
+    text-decoration: none;
+
     &:hover {
       transform: translateY(-0.0625rem);
       box-shadow: none;
@@ -97,5 +110,12 @@ body {
         transform: translateY(0);
       }
     }
+  }
+  .card {
+    border-radius: .5rem;
+    padding: 2rem;
+    margin-top: 2.5rem;
+    border: 0.063rem solid $grey-light;
+    box-shadow: 0 0.625rem 0.625rem 0 rgba(0, 0, 0, 0.02);
   }
 }

@@ -1,17 +1,18 @@
 @import '../../Colors';
 
 .create-note {
-  .spinner-border {
+  .new-note {
     display: block;
-    margin: auto;
+    text-align: center;
+    margin-top: 2.5rem;
     color: $purple;
+    text-decoration: none;
+    transition: all .3s;
+    &:hover {
+      color: $purple-light;
+    }
   }
   .card {
-    border-radius: .5rem;
-    padding: 2rem;
-    margin-top: 2.5rem;
-    border: 0.063rem solid $grey-light;
-    box-shadow: 0 0.625rem 0.625rem 0 rgba(0, 0, 0, 0.02);
     .form-group {
       margin-bottom: 1.5rem;
       .form-control {

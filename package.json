@@ -5,6 +5,8 @@
   "dependencies": {
     "autoprefixer": "^9.5.0",
     "bootstrap-scss": "^4.3.1",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.23",
     "promise-polyfill": "^8.1.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -24,6 +26,7 @@
     "@babel/core": "^7.4.0",
     "@babel/preset-react": "^7.0.0",
     "@types/jest": "24.0.11",
+    "@types/moment-timezone": "^0.5.12",
     "@types/node": "11.12.1",
     "@types/react": "16.8.10",
     "@types/react-dom": "16.8.3",

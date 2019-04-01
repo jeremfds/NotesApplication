@@ -26,14 +26,13 @@ export const clearGetNotes = (): ActionGetNotes => ({
 });
 
 export const getNotes = (): RTAction<void> => (dispatch: RTDispatch) => {
-    const localStorageAvailable = window.localStorage;
-    if (localStorageAvailable) {
-        // @ts-ignore
-        const notes: MNote[] = JSON.parse(window.localStorage.getItem(NOTES));
-        if (notes && notes.constructor === Array && notes.length > 0) {
-            dispatch(getNotesArray(notes));
-        } else {
+    const storage = window.localStorage;
+    if (storage) {
+        const notes: MNote[] = JSON.parse(<string>storage.getItem(NOTES));
+        if (notes === null || Array.empty(notes)) {
             dispatch(getNotesEmpty());
+        } else {
+            dispatch(getNotesArray(notes));
         }
     } else {
         dispatch(getNotesFailure());

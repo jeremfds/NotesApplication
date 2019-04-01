@@ -40,9 +40,9 @@ class Header extends Component<IProps, IState> {
                             <Nav className="ml-auto" navbar>
                                 <NavItem>
                                     <NavLink tag={Link}
-                                             title="Homepage"
+                                             title="My notes"
                                              to="/">
-                                        Homepage
+                                        My notes
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>

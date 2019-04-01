@@ -3,4 +3,6 @@ export interface MNote {
     title: string;
     text: string;
     type: string;
+    priority: string;
+    date: string;
 }

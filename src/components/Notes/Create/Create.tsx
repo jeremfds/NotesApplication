@@ -3,20 +3,17 @@ import { Container, Row, Col, Card, Form, FormGroup, Input, Label, Button, FormT
 import { MNote } from '../../../models/notes';
 import { MErrors } from '../../../models/utils';
 import { connect } from 'react-redux';
+import moment, { Moment } from 'moment';
+import 'moment-timezone';
+import { Link } from 'react-router-dom';
 import { IRootState, RTDispatch } from '../../../roots';
-import { getNotes } from '../../../actions/notes/actionGetNotes';
-import { clearGetNotes } from '../../../actions/notes/actionGetNotes';
-import { createNote } from '../../../actions/notes/actionCreateNote';
-import { clearCreateNote } from '../../../actions/notes/actionCreateNote';
+import { createNote, clearCreateNote } from '../../../actions/notes/actionCreateNote';
 import './Create.scss';
 
 interface IProps {
-    notes: MNote[];
-    successGetNotes: boolean;
-    successCreateNote: boolean;
-    getNotes: () => void;
-    clearGetNotes: () => void;
-    createNote: (notes: MNote[], note: MNote) => void;
+    success: boolean;
+    notCompatible: boolean;
+    createNote: (note: MNote) => void;
     clearCreateNote: () => void;
 }
 
@@ -27,50 +24,49 @@ interface IState {
     isLoading: boolean;
 }
 
+const timezone: string = moment.tz.guess() || 'Europe/London';
+const date: Moment = moment.tz(moment().toDate(), timezone);
+const noteDate: string = date.format('LLL');
+
 class Create extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
             note: {
-                id: 0,
+                id: 1,
                 title: '',
                 text: '',
-                type: ''
+                type: '',
+                priority: '',
+                date: noteDate
             },
             errors: {
                 title: '',
                 text: '',
-                type: ''
+                type: '',
+                priority: ''
             },
             isEnabled: false,
-            isLoading: true
+            isLoading: false
         };
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
 
-    componentDidMount(): void {
-        this.props.getNotes();
-    }
-
     componentDidUpdate(prevProps: IProps): void {
         if (this.state.isLoading) {
-            if (prevProps.successGetNotes !== this.props.successGetNotes) {
-                setTimeout(() => this.setState({isLoading: false}), 500);
-            }
-            if (prevProps.successCreateNote !== this.props.successCreateNote) {
+            if (prevProps.success !== this.props.success) {
                 setTimeout(() =>
                     this.setState({
-                        note: { id: 0, title: '', text: '', type: '' },
+                        note: { id: 0, title: '', text: '', type: '', priority: '', date: '' },
                         isLoading: false,
                         isEnabled: false
-                }), 500);
+                }), 300);
             }
         }
     }
 
     componentWillUnmount(): void {
-        this.props.clearGetNotes();
         this.props.clearCreateNote();
     }
 
@@ -115,7 +111,16 @@ class Create extends Component<IProps, IState> {
                     value.includes("Other")) {
                     errors[name] = '';
                 } else {
-                    errors[name] = 'The type is not on the list.';
+                    errors[name] = 'This type is not on the list.';
+                }
+                break;
+            case 'priority':
+                if (value.includes("High") ||
+                    value.includes("Medium") ||
+                    value.includes("Low")) {
+                    errors[name] = '';
+                } else {
+                    errors[name] = 'This priority is not on the list.';
                 }
                 break;
             default:
@@ -136,34 +141,29 @@ class Create extends Component<IProps, IState> {
         event.preventDefault();
         if (this.state.isEnabled) {
             const note: MNote = this.state.note;
-            const notes: MNote[] = this.props.notes;
             this.props.clearCreateNote();
-            this.setState({isLoading: true}, () => this.props.createNote(notes, note));
+            this.setState({isLoading: true}, () => this.props.createNote(note));
         }
     }
 
     render(): ReactNode {
         const note: MNote = this.state.note;
 
-        console.log(this.props.notes, "kkk : ",  this.props.successGetNotes);
-
-        const successCreatedNote: ReactNode = (
-            <UncontrolledAlert color="success">
-                You successfully created a note
-            </UncontrolledAlert>
+        const alertSuccessCreatedNote: ReactNode = (
+            this.props.success ?
+                (
+                    <UncontrolledAlert color="success">
+                        You successfully created a note ✅
+                    </UncontrolledAlert>
+                ) : null
         );
 
-        if (!this.props.successGetNotes) {
-            return (
-                <Container className="create-note">
-                    <Row>
-                        <Col>
-                            <div>Your browser is not compatible with LocalStorage</div>
-                        </Col>
-                    </Row>
-                </Container>
-            )
-        }
+        const successCreatedNote: ReactNode = (
+            this.props.success ?
+                (
+                    <Link to={"/"} title="See my new note posted" className="new-note">← See my new posted note</Link>
+                ) : null
+        );
 
         if (this.state.isLoading) {
             return (
@@ -171,6 +171,18 @@ class Create extends Component<IProps, IState> {
                     <Row>
                         <Col>
                             <Spinner />
+                        </Col>
+                    </Row>
+                </Container>
+            )
+        }
+
+        if (this.props.notCompatible) {
+            return (
+                <Container className="create-note">
+                    <Row>
+                        <Col>
+                            <p>Your browser is not compatible with the localStorage technology.</p>
                         </Col>
                     </Row>
                 </Container>
@@ -186,10 +198,9 @@ class Create extends Component<IProps, IState> {
                 </Row>
                 <Row>
                     <Col xs={12} md={{ size: 6, offset: 3 }}>
+                        {successCreatedNote}
                         <Card>
-                            {
-                                this.props.successCreateNote ? successCreatedNote : null
-                            }
+                            {alertSuccessCreatedNote}
                             <Form onSubmit={this.onSubmit}>
                                 <FormGroup>
                                     <Label for="title">Title</Label>
@@ -228,7 +239,7 @@ class Create extends Component<IProps, IState> {
                                     }
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="type">Select type</Label>
+                                    <Label for="type">Type</Label>
                                     <Input type="select"
                                            name="type"
                                            id="type"
@@ -252,6 +263,31 @@ class Create extends Component<IProps, IState> {
                                         </FormText>
                                     }
                                 </FormGroup>
+                                <FormGroup>
+                                    <Label for="priority">Priority</Label>
+                                    <Input type="select"
+                                           name="priority"
+                                           id="priority"
+                                           value={note.priority}
+                                           onChange={this.onChange}
+                                           className="custom-select"
+                                           valid={
+                                               note.priority.includes("High") ||
+                                               note.priority.includes("Medium") ||
+                                               note.priority.includes("Low")
+                                           }>
+                                        <option hidden defaultValue="--">--</option>
+                                        <option>High</option>
+                                        <option>Medium</option>
+                                        <option>Low</option>
+                                    </Input>
+                                    {
+                                        this.state.errors.priority &&
+                                        <FormText color="danger">
+                                            {this.state.errors.priority}
+                                        </FormText>
+                                    }
+                                </FormGroup>
                                 <Button className="purple-button"
                                         disabled={!this.state.isEnabled}>
                                     Create the note
@@ -266,28 +302,22 @@ class Create extends Component<IProps, IState> {
 }
 
 interface IStateToProps {
-    notes: MNote[];
-    successGetNotes: boolean;
-    successCreateNote: boolean;
+    success: boolean;
+    notCompatible: boolean;
 }
 
 interface IDispatchToProps {
-    getNotes: () => void;
-    clearGetNotes: () => void;
-    createNote: (notes: MNote[], note: MNote) => void;
+    createNote: (note: MNote) => void;
     clearCreateNote: () => void;
 }
 
 const mapStateToProps = (state: IRootState): IStateToProps => ({
-    notes: state.getNotes.notes,
-    successGetNotes: state.getNotes.success,
-    successCreateNote: state.createNote.success
+    success: state.createNote.success,
+    notCompatible: state.createNote.notCompatible
 });
 
 const mapDispatchToProps = (dispatch: RTDispatch): IDispatchToProps => ({
-    getNotes: () => dispatch(getNotes()),
-    clearGetNotes: () => dispatch(clearGetNotes()),
-    createNote: (notes: MNote[], note: MNote) => dispatch(createNote(notes, note)),
+    createNote: (note: MNote) => dispatch(createNote(note)),
     clearCreateNote: () => dispatch(clearCreateNote())
 });
 
