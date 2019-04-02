@@ -31,13 +31,25 @@ class Search extends Component<IProps, IState> {
             notes: []
         };
         this.onChange = this.onChange.bind(this);
+        this.onClick = this.onClick.bind(this);
     }
 
-    applySearch() {
+    resetSearch(): void {
+        const notes: MNote[] = JSON.parse(window.localStorage.getItem(NOTES));
+        this.setState({
+            search: {
+                text: '',
+                type: '',
+                priority: ''
+            }
+        }, () =>  this.props.searchNotes(notes));
+    }
+
+    applySearch(): void {
         this.props.searchNotes(this.state.notes);
     }
 
-    searchType() {
+    searchType(): void {
         const notes: MNote[] = this.state.notes;
         const search: ISearch = this.state.search;
         if (search.type) {
@@ -48,7 +60,7 @@ class Search extends Component<IProps, IState> {
         }
     }
 
-    searchPriority() {
+    searchPriority(): void {
         const notes: MNote[] = this.state.notes;
         const search: ISearch = this.state.search;
         if (search.priority) {
@@ -72,6 +84,10 @@ class Search extends Component<IProps, IState> {
         const value: string = event.target.value;
         search[field] = name === 'text' ? value : value.charAt(0).toUpperCase() + value.slice(1);
         this.setState({search: search}, () => this.search());
+    }
+
+    onClick(): void {
+        this.resetSearch();
     }
 
     render(): ReactNode {
@@ -113,7 +129,7 @@ class Search extends Component<IProps, IState> {
                         <option>Low</option>
                     </Input>
                 </FormGroup>
-                <Button className="reset-button">Reset</Button>
+                <Button className="reset-button" onClick={this.onClick}>Reset</Button>
             </Form>
         )
     }
