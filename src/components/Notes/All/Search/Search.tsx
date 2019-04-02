@@ -12,6 +12,7 @@ interface ISearch {
     text: string;
     type: string;
     priority: string;
+    sort: string;
 }
 
 interface IState {
@@ -27,7 +28,8 @@ class Search extends Component<IProps, IState> {
             search: {
                 text: '',
                 type: '',
-                priority: ''
+                priority: '',
+                sort: 'Recent',
             },
             notes: []
         };
@@ -42,7 +44,8 @@ class Search extends Component<IProps, IState> {
             search: {
                 text: '',
                 type: '',
-                priority: ''
+                priority: '',
+                sort: 'Recent'
             }
         }, () =>  this.props.searchNotes(notes));
     }
@@ -51,7 +54,18 @@ class Search extends Component<IProps, IState> {
         if (this.timeoutID) {
             clearTimeout(this.timeoutID);
         }
+        console.log(this.state.notes);
         this.timeoutID = setTimeout(() => this.props.searchNotes(this.state.notes), timeout);
+    }
+
+    sortNotes(timeout: number): void {
+        const notes: MNote[] = this.state.notes;
+        const search: ISearch = this.state.search;
+        if (search.sort === 'Recent') {
+            this.setState({notes: notes}, () => this.applySearch(timeout));
+        } else {
+            this.setState({notes: notes.reverse()}, () => this.applySearch(timeout));
+        }
     }
 
     searchType(timeout: number): void {
@@ -59,9 +73,9 @@ class Search extends Component<IProps, IState> {
         const search: ISearch = this.state.search;
         if (search.type) {
             const filter: MNote[] = notes.filter(note => note.type === search.type);
-            this.setState({notes: filter}, () => this.applySearch(timeout));
+            this.setState({notes: filter}, () => this.sortNotes(timeout));
         } else {
-            this.applySearch(timeout);
+            this.sortNotes(timeout);
         }
     }
 
@@ -106,42 +120,58 @@ class Search extends Component<IProps, IState> {
 
         return (
             <Form className="search">
-                <FormGroup>
-                    <Input type="text"
-                           name="text"
-                           id="text"
-                           placeholder="Search"
-                           value={search.text}
-                           onChange={this.onChange}
-                    />
-                </FormGroup>
-                <FormGroup>
-                    <Input type="select"
-                           name="type"
-                           id="type"
-                           value={search.type}
-                           className="custom-select"
-                           onChange={this.onChange}>
-                        <option hidden defaultValue="--">Type</option>
-                        <option>Work</option>
-                        <option>Personal</option>
-                        <option>Other</option>
-                    </Input>
-                </FormGroup>
-                <FormGroup>
-                    <Input type="select"
-                           name="priority"
-                           id="priority"
-                           value={search.priority}
-                           className="custom-select"
-                           onChange={this.onChange}>
-                        <option hidden defaultValue="--">Priority</option>
-                        <option>High</option>
-                        <option>Medium</option>
-                        <option>Low</option>
-                    </Input>
-                </FormGroup>
-                <Button className="reset-button" onClick={this.onClick}>Reset</Button>
+                <div className="first-line">
+                    <FormGroup>
+                        <Input type="text"
+                               name="text"
+                               id="text"
+                               placeholder="Search"
+                               value={search.text}
+                               onChange={this.onChange}
+                        />
+                    </FormGroup>
+                </div>
+                <div className="second-line">
+                    <FormGroup>
+                        <Input type="select"
+                               name="type"
+                               id="type"
+                               value={search.type}
+                               className="custom-select"
+                               onChange={this.onChange}>
+                            <option hidden defaultValue="--">Type</option>
+                            <option>Work</option>
+                            <option>Personal</option>
+                            <option>Other</option>
+                        </Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Input type="select"
+                               name="priority"
+                               id="priority"
+                               value={search.priority}
+                               className="custom-select"
+                               onChange={this.onChange}>
+                            <option hidden defaultValue="--">Priority</option>
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Input type="select"
+                               name="sort"
+                               id="sort"
+                               value={search.sort}
+                               className="custom-select"
+                               onChange={this.onChange}>
+                            <option>Recent</option>
+                            <option>Older</option>
+                        </Input>
+                    </FormGroup>
+                    <Button className="reset-button" onClick={this.onClick}>Reset</Button>
+                    <Button className="delete-button" onClick={this.onClick}>Delete all</Button>
+                </div>
             </Form>
         )
     }

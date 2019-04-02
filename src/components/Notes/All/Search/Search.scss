@@ -5,58 +5,79 @@
   width: 100%;
   display: flex;
   align-items: center;
-  @media (max-width: 991px) {
-    flex-direction: column;
-  }
-  .form-group {
-    width: 20%;
-    margin: 0;
+  flex-direction: column;
+  .first-line, .second-line {
+    display: flex;
+    align-items: center;
+    width: 100%;
     @media (max-width: 991px) {
-      width: 100%;
+      flex-direction: column;
     }
-    &:first-child {
-      width: 50%;
-      @media (max-width: 991px) {
-        width: 100%;
+    .reset-button, .delete-button {
+      &.delete-button {
+        background-color: $red;
+        @media (max-width: 991px) {
+          margin-top: 0.625rem;
+        }
+        &:hover, &:active {
+          background-color: $red-light!important;
+        }
       }
-    }
-    &:nth-child(2) {
-      margin: 0 10px;
-      @media (max-width: 991px) {
-        margin: 10px 0;
-      }
-    }
-    &:nth-child(3) {
-      margin: 0 0.625rem 0 0;
-      @media (max-width: 991px) {
-        margin: 0 0 0.625rem 0;
-      }
-    }
-    .form-control {
-      border: 0.063rem solid $grey-light;
+      background-color: $purple;
+      border: none;
       border-radius: .5rem;
+      transition: all .3s;
+      margin-left: 1.25rem;
+      min-width: 7.5rem;
       @media (max-width: 768px) {
         font-size: 0.875rem;
       }
-      &::placeholder {
-        color: $grey-dark;
+      @media (max-width: 991px) {
+        margin: 0;
+        width: 100%;
       }
-      &:focus {
-        box-shadow: none;
+      &:hover, &:active {
+        background-color: $purple-light!important;
+      }
+    }
+    .form-group {
+      margin: 0;
+      .form-control {
+        border: 0.063rem solid $grey-light;
+        border-radius: .5rem;
+        @media (max-width: 768px) {
+          font-size: 0.875rem;
+        }
+        &::placeholder {
+          color: $grey-dark;
+        }
+        &:focus {
+          box-shadow: none;
+        }
       }
     }
   }
-  .reset-button {
-    background-color: $purple;
-    border: none;
-    border-radius: .5rem;
-    transition: all .3s;
-    width: 10%;
+  .first-line {
+    margin-bottom: 1rem;
     @media (max-width: 991px) {
+      margin-bottom: 0.625rem;
+    }
+    .form-group {
       width: 100%;
     }
-    &:hover, &:active {
-      background-color: $purple-light!important;
+  }
+  .second-line {
+    .form-group {
+      width: 100%;
+      @media (max-width: 991px) {
+        margin-bottom: 0.625rem;
+      }
+      &:nth-child(2) {
+        margin: 0 1.25rem;
+        @media (max-width: 991px) {
+          margin: 0 0 0.625rem 0;
+        }
+      }
     }
   }
 }

@@ -13,14 +13,14 @@ import {
     Spinner,
     UncontrolledAlert
 } from 'reactstrap';
-import {MNote} from '../../../models/notes';
-import {MErrors} from '../../../models/utils';
-import {connect} from 'react-redux';
-import moment, {Moment} from 'moment';
+import moment, { Moment } from 'moment';
 import 'moment-timezone';
-import {Link} from 'react-router-dom';
-import {IRootState, RTDispatch} from '../../../roots';
-import {clearCreateNote, createNote} from '../../../actions/notes/actionCreateNote';
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { clearCreateNote, createNote } from '../../../actions/notes/actionCreateNote';
+import { MNote } from '../../../models/notes';
+import { MErrors } from '../../../models/utils';
+import { IRootState, RTDispatch } from '../../../roots';
 import './Create.scss';
 
 interface IProps {

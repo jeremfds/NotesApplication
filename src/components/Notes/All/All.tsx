@@ -139,7 +139,7 @@ class All extends Component<IProps, IState> {
                 </Row>
             ) : (
                 <Row>
-                    <Col xs={12} sm={{ size: 8, offset: 2 }}>
+                    <Col xs={12} md={{ size: 8, offset: 2 }}>
                         {
                             notes.map((note: MNote, index: number) => {
                                 return (
@@ -155,12 +155,12 @@ class All extends Component<IProps, IState> {
         return (
             <Container>
                 <Row>
-                    <Col xs={12} sm={{ size: 8, offset: 2 }}>
+                    <Col xs={12} md={{ size: 8, offset: 2 }}>
                         <h1>My notes</h1>
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={12} sm={{ size: 8, offset: 2 }}>
+                    <Col xs={12} md={{ size: 8, offset: 2 }}>
                         <Search searchNotes={this.searchNotes} />
                     </Col>
                 </Row>

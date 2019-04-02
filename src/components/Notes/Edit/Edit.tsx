@@ -17,6 +17,8 @@ import { NOTES } from '../../../configs';
 import { connect } from 'react-redux';
 import { showNote, clearShowNote } from '../../../actions/notes/actionShowNote';
 import { clearEditNote, editNote } from '../../../actions/notes/actionEditNote';
+import moment, { Moment } from 'moment';
+import 'moment-timezone';
 import { MNote } from '../../../models/notes';
 import { MErrors } from '../../../models/utils';
 import { IRootState, RTDispatch } from '../../../roots';
@@ -181,7 +183,10 @@ class Show extends Component<IProps, IState> {
         event.preventDefault();
         if (this.state.isEnabled) {
             const note: MNote = this.state.note;
+            const timezone: string = moment.tz.guess() || 'Europe/London';
+            const date: Moment = moment.tz(moment().toDate(), timezone);
             note.version = note.version + 1;
+            note.date = date.format('LLLL');
             this.setState({isLoading: true}, () => this.props.editNote(note.id, note));
         }
     }
