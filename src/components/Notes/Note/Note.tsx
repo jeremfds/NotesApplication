@@ -62,6 +62,7 @@ class Note extends Component<IProps, IState> {
                     <div className="title-container">
                         <h2>{note.title}</h2>
                         <time className="date">{note.date}</time>
+                        <span className="version">version {note.version}</span>
                     </div>
                     <span className={`priority ${note.priority.toLowerCase()}`} />
                 </CardHeader>
@@ -76,7 +77,7 @@ class Note extends Component<IProps, IState> {
                                 <Link to={`/show/${note.id}`} title={note.title} className="icon see" />
                             ) : null
                         }
-                        <div className="icon edit"/>
+                        <Link to={`/edit/${note.id}`} title={note.title} className="icon edit" />
                         <div className="icon delete" onClick={this.toggleModal} />
                         <Modal isOpen={this.state.modal} toggle={this.toggleModal}>
                             <ModalHeader toggle={this.toggleModal}>Are you sure ?</ModalHeader>

@@ -1,33 +1,41 @@
 import React, {ChangeEvent, Component, FormEvent, ReactNode} from 'react';
 import {
-    Button,
-    Card,
-    Col,
     Container,
+    Row,
+    Col,
+    Spinner,
+    Card,
     Form,
     FormGroup,
-    FormText,
-    Input,
     Label,
-    Row,
-    Spinner,
+    Input,
+    FormText,
+    Button,
     UncontrolledAlert
 } from 'reactstrap';
-import {MNote} from '../../../models/notes';
-import {MErrors} from '../../../models/utils';
-import {connect} from 'react-redux';
-import moment, {Moment} from 'moment';
-import 'moment-timezone';
-import {Link} from 'react-router-dom';
-import {IRootState, RTDispatch} from '../../../roots';
-import {clearCreateNote, createNote} from '../../../actions/notes/actionCreateNote';
-import './Create.scss';
+import { NOTES } from '../../../configs';
+import { connect } from 'react-redux';
+import { showNote, clearShowNote } from '../../../actions/notes/actionShowNote';
+import { clearEditNote, editNote } from '../../../actions/notes/actionEditNote';
+import { MNote } from '../../../models/notes';
+import { MErrors } from '../../../models/utils';
+import { IRootState, RTDispatch } from '../../../roots';
+import { RouteComponentProps} from 'react-router';
 
-interface IProps {
-    success: boolean;
-    notCompatible: boolean;
-    createNote: (note: MNote) => void;
-    clearCreateNote: () => void;
+interface IMatch  {
+    id?: string;
+}
+
+interface IProps extends RouteComponentProps<IMatch> {
+    note: MNote;
+    successGetNote: boolean;
+    successEditNote: boolean;
+    notCompatibleGet: boolean;
+    notCompatibleEdit: boolean;
+    showNote: (id: number) => void;
+    clearShowNote: () => void;
+    editNote: (id: number, note: MNote) => void;
+    clearEditNote: () => void;
 }
 
 interface IState {
@@ -37,7 +45,7 @@ interface IState {
     isLoading: boolean;
 }
 
-class Create extends Component<IProps, IState> {
+class Show extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -47,7 +55,7 @@ class Create extends Component<IProps, IState> {
                 text: '',
                 type: '',
                 priority: '',
-                date: 'date',
+                date: '',
                 version: 1
             },
             errors: {
@@ -57,27 +65,49 @@ class Create extends Component<IProps, IState> {
                 priority: ''
             },
             isEnabled: false,
-            isLoading: false
+            isLoading: true
         };
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
 
-    componentDidUpdate(prevProps: IProps): void {
-        if (this.state.isLoading) {
-            if (prevProps.success !== this.props.success) {
-                setTimeout(() =>
-                    this.setState({
-                        note: { id: 0, title: '', text: '', type: '', priority: '', date: 'date', version: 1 },
-                        isLoading: false,
-                        isEnabled: false
-                }), 300);
+    componentDidMount(): void {
+        const id: number = parseInt(this.props.match.params.id);
+        if (isNaN(id)) {
+            this.props.history.push('/');
+        } else {
+            const notes: MNote[] = JSON.parse(window.localStorage.getItem(NOTES));
+            if (notes !== null) {
+                if (notes.some(note => note.id === id)) {
+                    this.props.showNote(id);
+                } else {
+                    this.props.history.push('/');
+                }
+            } else {
+                this.props.history.push('/');
             }
         }
     }
 
+    static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
+        if (!Object.equals(nextProps.note, prevState.note)) {
+            return {
+                note: nextProps.note,
+                isEnabled: true
+            }
+        }
+        return null;
+    }
+
+    componentDidUpdate(prevProps: IProps): void {
+        if (this.state.isLoading) {
+            setTimeout(() => this.setState({isLoading: false}), 300);
+        }
+    }
+
     componentWillUnmount(): void {
-        this.props.clearCreateNote();
+        this.props.clearShowNote();
+        this.props.clearEditNote();
     }
 
     validateForm(): void {
@@ -151,17 +181,14 @@ class Create extends Component<IProps, IState> {
         event.preventDefault();
         if (this.state.isEnabled) {
             const note: MNote = this.state.note;
-            const timezone: string = moment.tz.guess() || 'Europe/London';
-            const date: Moment = moment.tz(moment().toDate(), timezone);
-            note.date = date.format('LLLL');
-            this.props.clearCreateNote();
-            this.setState({isLoading: true}, () => this.props.createNote(note));
+            note.version = note.version + 1;
+            this.setState({isLoading: true}, () => this.props.editNote(note.id, note));
         }
     }
 
     render(): ReactNode {
 
-        if (this.props.notCompatible) {
+        if (this.props.notCompatibleGet || this.props.notCompatibleEdit) {
             return (
                 <Container>
                     <Row>
@@ -188,19 +215,12 @@ class Create extends Component<IProps, IState> {
         }
 
         const note: MNote = this.state.note;
-        const alertSuccessCreatedNote: ReactNode = (
-            this.props.success ?
+        const alertSuccessEditNote: ReactNode = (
+            this.props.successEditNote ?
                 (
                     <UncontrolledAlert color="success">
-                        You successfully created a note ✅
+                        You successfully edited the note ✅
                     </UncontrolledAlert>
-                ) : null
-        );
-
-        const successCreatedNote: ReactNode = (
-            this.props.success ?
-                (
-                    <Link to={"/"} title="See my new note posted" className="new-note">← See my new posted note</Link>
                 ) : null
         );
 
@@ -208,14 +228,13 @@ class Create extends Component<IProps, IState> {
             <Container className="create-note">
                 <Row>
                     <Col>
-                        <h1 className="text-center">Create a note</h1>
+                        <h1 className="text-center">Edit a note</h1>
                     </Col>
                 </Row>
                 <Row>
                     <Col xs={12} md={{ size: 6, offset: 3 }}>
-                        {successCreatedNote}
                         <Card>
-                            {alertSuccessCreatedNote}
+                            {alertSuccessEditNote}
                             <Form onSubmit={this.onSubmit}>
                                 <FormGroup>
                                     <Label for="title">Title</Label>
@@ -305,7 +324,7 @@ class Create extends Component<IProps, IState> {
                                 </FormGroup>
                                 <Button className="purple-button"
                                         disabled={!this.state.isEnabled}>
-                                    Create the note
+                                    Edit the note
                                 </Button>
                             </Form>
                         </Card>
@@ -317,26 +336,36 @@ class Create extends Component<IProps, IState> {
 }
 
 interface IStateToProps {
-    success: boolean;
-    notCompatible: boolean;
+    note: MNote;
+    successGetNote: boolean;
+    notCompatibleGet: boolean;
+    notCompatibleEdit: boolean;
+    successEditNote: boolean;
 }
 
 interface IDispatchToProps {
-    createNote: (note: MNote) => void;
-    clearCreateNote: () => void;
+    showNote: (id: number) => void;
+    clearShowNote: () => void;
+    editNote: (id: number, note: MNote) => void;
+    clearEditNote: () => void;
 }
 
 const mapStateToProps = (state: IRootState): IStateToProps => ({
-    success: state.createNote.success,
-    notCompatible: state.createNote.notCompatible
+    note: state.showNote.note,
+    successGetNote: state.showNote.success,
+    notCompatibleGet: state.showNote.notCompatible,
+    notCompatibleEdit: state.editNote.notCompatible,
+    successEditNote: state.editNote.success,
 });
 
 const mapDispatchToProps = (dispatch: RTDispatch): IDispatchToProps => ({
-    createNote: (note: MNote) => dispatch(createNote(note)),
-    clearCreateNote: () => dispatch(clearCreateNote())
+    showNote: (id: number) => dispatch(showNote(id)),
+    clearShowNote: () => dispatch(clearShowNote()),
+    editNote: (id: number, note: MNote) => dispatch(editNote(id, note)),
+    clearEditNote: () => dispatch(clearEditNote())
 });
 
 export default connect<IStateToProps, IDispatchToProps, IProps, IRootState>(
     mapStateToProps,
     mapDispatchToProps
-)(Create);
+)(Show);

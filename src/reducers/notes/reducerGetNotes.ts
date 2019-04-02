@@ -17,7 +17,7 @@ const INITIAL_STATE: IGetNotes = {
 const reducerGetNotes = (state: IGetNotes = INITIAL_STATE, action: ActionGetNotes): IGetNotes => {
     switch (action.type) {
         case GET_NOTES_ARRAY:
-            return <IGetNotes>{...state, notes: action.notes, success: true, notCompatible: false};
+            return {...state, notes: action.notes, success: true, notCompatible: false};
         case GET_NOTES_EMPTY:
             return { ...state, notes: [], success: true, notCompatible: false };
         case GET_NOTES_FAILURE:

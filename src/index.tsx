@@ -1,5 +1,6 @@
 import 'promise-polyfill/src/polyfill';
 import './utils/array';
+import './utils/object';
 import React from 'react';
 import { render } from 'react-dom';
 import App from './components/App';

@@ -5,10 +5,10 @@ import { NOTES } from '../../configs';
 import { MNote } from '../../models/notes';
 
 export interface ActionShowNote extends Action<string> {
-    note?: MNote[]
+    note?: MNote
 }
 
-const showNoteSuccess = (note: MNote[]): ActionShowNote => ({
+const showNoteSuccess = (note: MNote): ActionShowNote => ({
     type: SHOW_NOTE_SUCCESS,
     note
 });
@@ -22,9 +22,10 @@ export const clearShowNote = (): ActionShowNote => ({
 });
 
 export const showNote = (id: number): RTAction<void> => (dispatch: RTDispatch) => {
-    const notes: MNote[] = JSON.parse(<string>window.localStorage.getItem(NOTES));
-    if (!notes === null || !Array.empty(notes)) {
-        const filteredArray: MNote[] = notes.filter(note => note.id === id);
+    const storage = window.localStorage;
+    if (storage) {
+        const notes: MNote[] = JSON.parse(storage.getItem(NOTES));
+        const filteredArray: MNote = notes.find(note => note.id === id);
         dispatch(showNoteSuccess(filteredArray));
     } else {
         dispatch(showNoteFailure());

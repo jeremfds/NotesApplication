@@ -63,19 +63,6 @@ class All extends Component<IProps, IState> {
     }
 
     render(): ReactNode {
-        const notes: MNote[] = this.state.notes;
-
-        if (this.state.isLoading) {
-            return (
-                <Container>
-                    <Row>
-                        <Col>
-                            <Spinner />
-                        </Col>
-                    </Row>
-                </Container>
-            )
-        }
 
         if (this.props.notCompatible) {
             return (
@@ -91,6 +78,19 @@ class All extends Component<IProps, IState> {
             )
         }
 
+        if (this.state.isLoading) {
+            return (
+                <Container>
+                    <Row>
+                        <Col>
+                            <Spinner />
+                        </Col>
+                    </Row>
+                </Container>
+            )
+        }
+
+        const notes: MNote[] = this.state.notes;
         if (Array.empty(notes)) {
             return (
                 <Container>

@@ -1,6 +1,7 @@
 import React, { Component, ReactNode } from 'react';
 import { Container, Row, Col, Spinner } from 'reactstrap';
 import { connect } from 'react-redux';
+import { NOTES } from '../../../configs';
 import { showNote, clearShowNote } from '../../../actions/notes/actionShowNote';
 import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
@@ -12,14 +13,15 @@ interface IMatch  {
 }
 
 interface IProps extends RouteComponentProps<IMatch> {
-    note: MNote[];
+    note: MNote;
     success: boolean;
+    notCompatible: boolean;
     showNote: (id: number) => void;
     clearShowNote: () => void;
 }
 
 interface IState {
-    note: MNote[];
+    note: MNote;
     isLoading: boolean;
     refreshNotes: boolean;
 }
@@ -28,7 +30,14 @@ class Show extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            note: [],
+            note: {
+                id: 1,
+                title: '',
+                text: '',
+                type: '',
+                priority: '',
+                date: ''
+            },
             isLoading: true,
             refreshNotes: false
         };
@@ -40,12 +49,21 @@ class Show extends Component<IProps, IState> {
         if (isNaN(id)) {
             this.props.history.push('/');
         } else {
-            this.props.showNote(id);
+            const notes: MNote[] = JSON.parse(window.localStorage.getItem(NOTES));
+            if (notes !== null) {
+                if (notes.some(note => note.id === id)) {
+                    this.props.showNote(id);
+                } else {
+                    this.props.history.push('/');
+                }
+            } else {
+                this.props.history.push('/');
+            }
         }
     }
 
     static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
-        if (!Array.equals(nextProps.note, prevState.note)) {
+        if (!Object.equals(nextProps.note, prevState.note)) {
             return {
                 note: nextProps.note
             }
@@ -53,7 +71,7 @@ class Show extends Component<IProps, IState> {
         return null;
     }
 
-    componentDidUpdate(prevProps: IProps, prevState: IState): void {
+    componentDidUpdate(prevProps: IProps): void {
         if (this.state.isLoading) {
             setTimeout(() => this.setState({isLoading: false}), 300);
         }
@@ -68,7 +86,20 @@ class Show extends Component<IProps, IState> {
     }
 
     render(): ReactNode {
-        const note: MNote[] = this.state.note;
+
+        if (this.props.notCompatible) {
+            return (
+                <Container>
+                    <Row>
+                        <Col>
+                            <p className="text-center">
+                                Your browser is not compatible with the localStorage technology.
+                            </p>
+                        </Col>
+                    </Row>
+                </Container>
+            )
+        }
 
         if (this.state.isLoading) {
             return (
@@ -86,7 +117,8 @@ class Show extends Component<IProps, IState> {
             return <Redirect to={'/'} />
         }
 
-        if (Array.empty(note) || note === null) {
+        const note: MNote = this.state.note;
+        if (Object.empty(note) || note === null) {
             return (
                 <Container>
                     <Row>
@@ -102,14 +134,8 @@ class Show extends Component<IProps, IState> {
             <Container>
                 <Row>
                     <Col xs={12} sm={{ size: 8, offset: 2 }}>
-                        <h1>Note details</h1>
-                        {
-                            note.map((note: MNote, index: number) => {
-                                return (
-                                    <Note key={index} note={note} homepage={false} refreshNotes={this.refreshNotes} />
-                                )
-                            })
-                        }
+                        <h1>Detail of the note</h1>
+                        <Note note={note} homepage={false} refreshNotes={this.refreshNotes} />
                     </Col>
                 </Row>
             </Container>
@@ -118,8 +144,9 @@ class Show extends Component<IProps, IState> {
 }
 
 interface IStateToProps {
-    note: MNote[];
+    note: MNote;
     success: boolean;
+    notCompatible: boolean;
 }
 
 interface IDispatchToProps {
@@ -129,7 +156,8 @@ interface IDispatchToProps {
 
 const mapStateToProps = (state: IRootState): IStateToProps => ({
     note: state.showNote.note,
-    success: state.showNote.success
+    success: state.showNote.success,
+    notCompatible: state.showNote.notCompatible
 });
 
 const mapDispatchToProps = (dispatch: RTDispatch): IDispatchToProps => ({

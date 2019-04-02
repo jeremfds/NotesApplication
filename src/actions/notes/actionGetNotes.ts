@@ -28,7 +28,7 @@ export const clearGetNotes = (): ActionGetNotes => ({
 export const getNotes = (): RTAction<void> => (dispatch: RTDispatch) => {
     const storage = window.localStorage;
     if (storage) {
-        const notes: MNote[] = JSON.parse(<string>storage.getItem(NOTES));
+        const notes: MNote[] = JSON.parse(storage.getItem(NOTES));
         if (notes === null || Array.empty(notes)) {
             dispatch(getNotesEmpty());
         } else {

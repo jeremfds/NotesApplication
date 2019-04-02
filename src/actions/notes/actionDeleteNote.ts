@@ -19,12 +19,14 @@ export const clearDeleteNote = (): ActionDeleteNote => ({
 });
 
 export const deleteNote = (id: number): RTAction<void> => (dispatch: RTDispatch) => {
-    const notes: MNote[] = JSON.parse(<string>window.localStorage.getItem(NOTES));
-    if (!notes === null || !Array.empty(notes)) {
+    const storage = window.localStorage;
+    if (storage) {
+        const notes: MNote[] = JSON.parse(storage.getItem(NOTES));
         const filteredArray: string = JSON.stringify(notes.filter(note => note.id !== id));
         window.localStorage.setItem(NOTES, filteredArray);
         dispatch(deleteNoteSuccess());
     } else {
         dispatch(deleteNoteFailure());
     }
+
 };
