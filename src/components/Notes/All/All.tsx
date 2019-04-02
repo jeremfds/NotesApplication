@@ -6,6 +6,7 @@ import { clearGetNotes, getNotes } from '../../../actions/notes/actionGetNotes';
 import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
 import Note from '../Note';
+import Search from './Search';
 
 interface IProps {
     notes: MNote[];
@@ -19,6 +20,8 @@ interface IState {
     notes: MNote[];
     isLoading: boolean;
     refreshNotes: boolean;
+    searched: boolean;
+    searchLoading: boolean;
 }
 
 class All extends Component<IProps, IState> {
@@ -27,9 +30,12 @@ class All extends Component<IProps, IState> {
         this.state = {
             notes: [],
             isLoading: true,
-            refreshNotes: false
+            refreshNotes: false,
+            searched: false,
+            searchLoading: false
         };
         this.refreshNotes = this.refreshNotes.bind(this);
+        this.searchNotes = this.searchNotes.bind(this);
     }
 
     componentDidMount(): void {
@@ -37,20 +43,22 @@ class All extends Component<IProps, IState> {
     }
 
     static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
-       if (!Array.equals(nextProps.notes, prevState.notes)) {
-           return {
-               notes: nextProps.notes
-           }
-       }
-       return null;
+        if (!Array.equals(nextProps.notes, prevState.notes) && !prevState.searched) {
+            return {
+                notes: nextProps.notes
+            }
+        }
+        return null;
     }
 
     componentDidUpdate(prevProps: IProps, prevState: IState): void {
         if (this.state.isLoading) {
             if (this.state.refreshNotes !== prevState.refreshNotes) {
-                this.setState({refreshNotes: false}, () => this.props.getNotes());
+                this.setState({refreshNotes: false, searched: false}, () => this.props.getNotes());
             }
             setTimeout(() => this.setState({isLoading: false}), 300);
+        } else if (this.state.searchLoading) {
+            setTimeout(() => this.setState({searchLoading: false}), 300);
         }
     }
 
@@ -60,6 +68,10 @@ class All extends Component<IProps, IState> {
 
     refreshNotes(makeRefresh: boolean): void {
         this.setState({refreshNotes: makeRefresh, isLoading: true});
+    }
+
+    searchNotes(notes: MNote[]): void {
+        this.setState({notes: notes, searched: true, searchLoading: true});
     }
 
     render(): ReactNode {
@@ -90,8 +102,8 @@ class All extends Component<IProps, IState> {
             )
         }
 
-        const notes: MNote[] = this.state.notes;
-        if (Array.empty(notes)) {
+        const notes: MNote[] = this.state.notes.reverse();
+        if (Array.empty(notes) && !this.state.searched) {
             return (
                 <Container>
                     <Row>
@@ -112,20 +124,47 @@ class All extends Component<IProps, IState> {
             )
         }
 
+        const displayNotes: ReactNode = (
+            this.state.searchLoading ? (
+                <Row>
+                    <Col>
+                        <Spinner />
+                    </Col>
+                </Row>
+            ) : Array.empty(notes) && this.state.searched ? (
+                <Row>
+                    <Col>
+                        <p className="text-center"> No notes</p>
+                    </Col>
+                </Row>
+            ) : (
+                <Row>
+                    <Col xs={12} sm={{ size: 8, offset: 2 }}>
+                        {
+                            notes.map((note: MNote, index: number) => {
+                                return (
+                                    <Note key={index} note={note} homepage={true} refreshNotes={this.refreshNotes} />
+                                )
+                            })
+                        }
+                    </Col>
+                </Row>
+            )
+        );
+
         return (
             <Container>
                 <Row>
                     <Col xs={12} sm={{ size: 8, offset: 2 }}>
                         <h1>My notes</h1>
-                        {
-                            notes.map((note: MNote, index: number) => {
-                               return (
-                                   <Note key={index} note={note} homepage={true} refreshNotes={this.refreshNotes} />
-                               )
-                            })
-                        }
                     </Col>
                 </Row>
+                <Row>
+                    <Col xs={12} sm={{ size: 8, offset: 2 }}>
+                        <Search searchNotes={this.searchNotes} />
+                    </Col>
+                </Row>
+                {displayNotes}
             </Container>
         )
     }

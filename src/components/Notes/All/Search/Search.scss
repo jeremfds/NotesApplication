@@ -1,0 +1,62 @@
+@import '../../../Colors';
+
+.search {
+  margin-bottom: 2.5rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  @media (max-width: 991px) {
+    flex-direction: column;
+  }
+  .form-group {
+    width: 20%;
+    margin: 0;
+    @media (max-width: 991px) {
+      width: 100%;
+    }
+    &:first-child {
+      width: 50%;
+      @media (max-width: 991px) {
+        width: 100%;
+      }
+    }
+    &:nth-child(2) {
+      margin: 0 10px;
+      @media (max-width: 991px) {
+        margin: 10px 0;
+      }
+    }
+    &:nth-child(3) {
+      margin: 0 0.625rem 0 0;
+      @media (max-width: 991px) {
+        margin: 0 0 0.625rem 0;
+      }
+    }
+    .form-control {
+      border: 0.063rem solid $grey-light;
+      border-radius: .5rem;
+      @media (max-width: 768px) {
+        font-size: 0.875rem;
+      }
+      &::placeholder {
+        color: $grey-dark;
+      }
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+  .reset-button {
+    background-color: $red;
+    border: none;
+    border-radius: .5rem;
+    transition: all .3s;
+    width: 10%;
+    @media (max-width: 991px) {
+      width: 100%;
+    }
+    &:hover, &:active {
+      background-color: $red-light!important;
+    }
+  }
+}
