@@ -25,8 +25,9 @@ export const showNote = (id: number): RTAction<void> => (dispatch: RTDispatch) =
     const storage = window.localStorage;
     if (storage) {
         const notes: MNote[] = JSON.parse(storage.getItem(NOTES));
-        const filteredArray: MNote = notes.find(note => note.id === id);
-        dispatch(showNoteSuccess(filteredArray));
+        const filteredArray: MNote[] = notes.filter(note => note.id === id);
+        const note: MNote = filteredArray[0];
+        dispatch(showNoteSuccess(note));
     } else {
         dispatch(showNoteFailure());
     }
