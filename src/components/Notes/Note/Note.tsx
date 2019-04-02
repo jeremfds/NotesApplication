@@ -67,7 +67,10 @@ class Note extends Component<IProps, IState> {
                     <span className={`priority ${note.priority.toLowerCase()}`} />
                 </CardHeader>
                 <CardBody>
-                    {note.text}
+                    {
+                        note.text.length < 255 ? note.text : this.props.homepage ?
+                            `${note.text.substr(0, 255)}...` : note.text
+                    }
                 </CardBody>
                 <CardFooter>
                     <span className={`show-type-name ${note.type.toLowerCase()}`}>{note.type}</span>
