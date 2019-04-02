@@ -3,7 +3,7 @@ import { ActionCreateNote } from '../../actions/notes/actionCreateNote';
 
 export interface ICreateNote {
     success: boolean;
-    notCompatible: boolean
+    notCompatible: boolean;
 }
 
 const INITIAL_STATE: ICreateNote = {

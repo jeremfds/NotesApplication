@@ -3,6 +3,7 @@ import { Container, Row, Col, Spinner } from 'reactstrap';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { clearGetNotes, getNotes } from '../../../actions/notes/actionGetNotes';
+import { clearShowNote } from '../../../actions/notes/actionShowNote';
 import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
 import Note from '../Note';
@@ -11,9 +12,11 @@ import Search from './Search';
 interface IProps {
     notes: MNote[];
     success: boolean;
+    successDeleteAllNotes: boolean;
     notCompatible: boolean;
     getNotes: () => void;
     clearGetNotes: () => void;
+    clearShowNote: () => void;
 }
 
 interface IState {
@@ -36,6 +39,7 @@ class All extends Component<IProps, IState> {
         };
         this.refreshNotes = this.refreshNotes.bind(this);
         this.searchNotes = this.searchNotes.bind(this);
+        this.hasDeleted = this.hasDeleted.bind(this);
     }
 
     componentDidMount(): void {
@@ -64,6 +68,7 @@ class All extends Component<IProps, IState> {
 
     componentWillUnmount(): void {
         this.props.clearGetNotes();
+        this.props.clearShowNote();
     }
 
     refreshNotes(makeRefresh: boolean): void {
@@ -74,9 +79,14 @@ class All extends Component<IProps, IState> {
         this.setState({notes: notes.reverse(), searched: true, searchLoading: true});
     }
 
+    hasDeleted(): void {
+        this.setState({isLoading: true});
+        setTimeout(() => this.props.getNotes(), 300);
+    }
+
     render(): ReactNode {
 
-        if (this.props.notCompatible) {
+        if (this.props.notCompatible || this.props.successDeleteAllNotes) {
             return (
                 <Container>
                     <Row>
@@ -143,7 +153,11 @@ class All extends Component<IProps, IState> {
                         {
                             notes.map((note: MNote, index: number) => {
                                 return (
-                                    <Note key={index} note={note} homepage={true} refreshNotes={this.refreshNotes} />
+                                    <Note key={index}
+                                          note={note}
+                                          homepage={true}
+                                          refreshNotes={this.refreshNotes}
+                                    />
                                 )
                             })
                         }
@@ -161,7 +175,7 @@ class All extends Component<IProps, IState> {
                 </Row>
                 <Row>
                     <Col xs={12} md={{ size: 8, offset: 2 }}>
-                        <Search searchNotes={this.searchNotes} />
+                        <Search searchNotes={this.searchNotes} hasDeleted={this.hasDeleted} />
                     </Col>
                 </Row>
                 {displayNotes}
@@ -174,22 +188,26 @@ interface IStateToProps {
     notes: MNote[];
     success: boolean;
     notCompatible: boolean;
+    successDeleteAllNotes: boolean;
 }
 
 interface IDispatchToProps {
     getNotes: () => void;
     clearGetNotes: () => void;
+    clearShowNote: () => void;
 }
 
 const mapStateToProps = (state: IRootState): IStateToProps => ({
     notes: state.getNotes.notes,
     success: state.getNotes.success,
-    notCompatible: state.getNotes.notCompatible
+    notCompatible: state.getNotes.notCompatible,
+    successDeleteAllNotes: state.deleteAllNotes.success
 });
 
 const mapDispatchToProps = (dispatch: RTDispatch): IDispatchToProps => ({
     getNotes: () => dispatch(getNotes()),
-    clearGetNotes: () => dispatch(clearGetNotes())
+    clearGetNotes: () => dispatch(clearGetNotes()),
+    clearShowNote: () => dispatch(clearShowNote())
 });
 
 export default connect<IStateToProps, IDispatchToProps, IProps, IRootState>(

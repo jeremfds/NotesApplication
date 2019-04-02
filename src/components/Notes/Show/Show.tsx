@@ -2,7 +2,7 @@ import React, { Component, ReactNode } from 'react';
 import { Container, Row, Col, Spinner } from 'reactstrap';
 import { connect } from 'react-redux';
 import { NOTES } from '../../../configs';
-import { showNote, clearShowNote } from '../../../actions/notes/actionShowNote';
+import { showNote } from '../../../actions/notes/actionShowNote';
 import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
 import {Redirect, RouteComponentProps} from 'react-router';
@@ -17,7 +17,6 @@ interface IProps extends RouteComponentProps<IMatch> {
     success: boolean;
     notCompatible: boolean;
     showNote: (id: number) => void;
-    clearShowNote: () => void;
 }
 
 interface IState {
@@ -75,10 +74,6 @@ class Show extends Component<IProps, IState> {
         if (this.state.isLoading) {
             setTimeout(() => this.setState({isLoading: false}), 300);
         }
-    }
-
-    componentWillUnmount(): void {
-        this.props.clearShowNote();
     }
 
     refreshNotes(makeRefresh: boolean): void {
@@ -151,7 +146,6 @@ interface IStateToProps {
 
 interface IDispatchToProps {
     showNote: (id: number) => void;
-    clearShowNote: () => void;
 }
 
 const mapStateToProps = (state: IRootState): IStateToProps => ({
@@ -161,8 +155,7 @@ const mapStateToProps = (state: IRootState): IStateToProps => ({
 });
 
 const mapDispatchToProps = (dispatch: RTDispatch): IDispatchToProps => ({
-    showNote: (id: number) => dispatch(showNote(id)),
-    clearShowNote: () => dispatch(clearShowNote())
+    showNote: (id: number) => dispatch(showNote(id))
 });
 
 export default connect<IStateToProps, IDispatchToProps, IProps, IRootState>(

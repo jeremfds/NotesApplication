@@ -1,11 +1,17 @@
 import React, {ChangeEvent, Component, ReactNode} from 'react';
-import {Form, FormGroup, Input, Button} from 'reactstrap';
+import { Form, FormGroup, Input, Button } from 'reactstrap';
 import { MNote } from '../../../../models/notes';
+import { IRootState, RTDispatch } from '../../../../roots';
+import { connect } from 'react-redux';
 import { NOTES } from '../../../../configs';
+import { deleteAllNotes, clearDeleteAllNotes } from '../../../../actions/notes/actionDeleteAllNotes';
 import './Search.scss';
 
 interface IProps {
     searchNotes: (notes: MNote[]) => void;
+    hasDeleted: () => void;
+    clearDeleteAllNotes?: () => void;
+    deleteAllNotes?: () => void;
 }
 
 interface ISearch {
@@ -35,7 +41,12 @@ class Search extends Component<IProps, IState> {
         };
         this.onChange = this.onChange.bind(this);
         this.onClick = this.onClick.bind(this);
+        this.deleteNotes = this.deleteNotes.bind(this);
         this.timeoutID = null;
+    }
+
+    componentWillUnmount(): void {
+        this.props.clearDeleteAllNotes();
     }
 
     resetSearch(): void {
@@ -54,7 +65,6 @@ class Search extends Component<IProps, IState> {
         if (this.timeoutID) {
             clearTimeout(this.timeoutID);
         }
-        console.log(this.state.notes);
         this.timeoutID = setTimeout(() => this.props.searchNotes(this.state.notes), timeout);
     }
 
@@ -109,6 +119,11 @@ class Search extends Component<IProps, IState> {
         const value: string = event.target.value;
         search[field] = field === 'text' ? value : value.charAt(0).toUpperCase() + value.slice(1);
         this.setState({search: search}, () => this.search());
+    }
+
+    deleteNotes(): void {
+        this.props.deleteAllNotes();
+        this.props.hasDeleted();
     }
 
     onClick(): void {
@@ -170,11 +185,24 @@ class Search extends Component<IProps, IState> {
                         </Input>
                     </FormGroup>
                     <Button className="reset-button" onClick={this.onClick}>Reset</Button>
-                    <Button className="delete-button" onClick={this.onClick}>Delete all</Button>
+                    <Button className="delete-button" onClick={this.deleteNotes}>Delete all</Button>
                 </div>
             </Form>
         )
     }
 }
 
-export default Search;
+interface IDispatchToProps {
+    deleteAllNotes: () => void;
+    clearDeleteAllNotes: () => void;
+}
+
+const mapDispatchToProps = (dispatch: RTDispatch): IDispatchToProps => ({
+    deleteAllNotes: () => dispatch(deleteAllNotes()),
+    clearDeleteAllNotes: () => dispatch(clearDeleteAllNotes())
+});
+
+export default connect<null, IDispatchToProps, IProps, IRootState>(
+    null,
+    mapDispatchToProps
+)(Search);

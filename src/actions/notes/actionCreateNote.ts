@@ -26,7 +26,8 @@ export const createNote = (note: MNote): RTAction<void> => (dispatch: RTDispatch
         if (notes === null || Array.empty(notes)) {
             newNote = JSON.stringify([note]);
         } else {
-            notes.push({...note, id: notes.length + 1});
+            const id: number = Math.max.apply(Math, notes.map((note => note.id)));
+            notes.push({...note, id: id + 1});
             newNote = JSON.stringify(notes);
         }
         localStorage.setItem(NOTES, newNote);
