@@ -22,10 +22,10 @@ export const editNote = (id: number, note: MNote): RTAction<void> => (dispatch: 
     const storage = window.localStorage;
     if (storage) {
         const notes: MNote[] = JSON.parse(storage.getItem(NOTES));
-        const index: number = notes.findIndex(note => note.id === id);
+        const filteredArray: MNote[] = notes.filter(note => note.id !== id);
         let newNote: string;
-        notes[index] = (note);
-        newNote = JSON.stringify(notes);
+        filteredArray.push(note);
+        newNote = JSON.stringify(filteredArray);
         localStorage.setItem(NOTES, newNote);
         dispatch(editNoteSuccess());
     } else {
