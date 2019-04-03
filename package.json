@@ -1,7 +1,7 @@
 {
-  "name": "my-app",
+  "name": "easy-notes",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "autoprefixer": "^9.5.0",
     "bootstrap-scss": "^4.3.1",
