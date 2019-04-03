@@ -1,29 +1,29 @@
-import React, {ChangeEvent, Component, FormEvent, ReactNode} from 'react';
+import React, { Component, FormEvent, ReactNode, ChangeEvent } from 'react';
 import {
-    Container,
-    Row,
-    Col,
-    Spinner,
+    Button,
     Card,
+    Col,
+    Container,
     Form,
     FormGroup,
-    Label,
-    Input,
     FormText,
-    Button,
+    Input,
+    Label,
+    Row,
+    Spinner,
     UncontrolledAlert
 } from 'reactstrap';
 import { NOTES } from '../../../configs';
-import { connect } from 'react-redux';
-import { showNote, clearShowNote } from '../../../actions/notes/actionShowNote';
-import { clearEditNote, editNote } from '../../../actions/notes/actionEditNote';
 import moment, { Moment } from 'moment';
+import CryptoJS, { DecryptedMessage } from 'crypto-js';
 import 'moment-timezone';
+import {connect} from 'react-redux';
+import { clearShowNote, showNote } from '../../../actions/notes/actionShowNote';
+import { clearEditNote, editNote } from '../../../actions/notes/actionEditNote';
 import { MNote } from '../../../models/notes';
 import { MErrors } from '../../../models/utils';
 import { IRootState, RTDispatch } from '../../../roots';
-import { RouteComponentProps} from 'react-router';
-import CryptoJS, { DecryptedMessage } from 'crypto-js';
+import { RouteComponentProps } from 'react-router';
 
 interface IMatch  {
     id?: string;
@@ -59,7 +59,8 @@ class Show extends Component<IProps, IState> {
                 type: '',
                 priority: '',
                 date: '',
-                version: 1
+                version: 1,
+                images: []
             },
             errors: {
                 title: '',
@@ -71,6 +72,7 @@ class Show extends Component<IProps, IState> {
             isLoading: true
         };
         this.onChange = this.onChange.bind(this);
+        this.onClick = this.onClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
 
@@ -187,6 +189,12 @@ class Show extends Component<IProps, IState> {
         this.setState({note: note}, () => this.validateField(field, value));
     }
 
+    onClick(image: string) {
+        const note: MNote = this.state.note;
+        note.images = note.images.filter(note => note !== image);
+        this.setState({note: note});
+    }
+
     onSubmit(event: FormEvent<HTMLFormElement>): void {
         event.preventDefault();
         if (this.state.isEnabled) {
@@ -235,6 +243,23 @@ class Show extends Component<IProps, IState> {
                         You successfully edited the note ✅
                     </UncontrolledAlert>
                 ) : null
+        );
+
+        const showImages: ReactNode = (
+            note.images.length > 0 ?
+                <div className="image-display-container edit">
+                    {
+                        note.images.map((image: string, index: number) => {
+                            return (
+                                <div key={index} className="edit">
+                                    <img src={image}
+                                         alt="image"
+                                         onClick={() => this.onClick(image)} />
+                                </div>
+                            )
+                        })
+                    }
+                </div> : null
         );
 
         return (
@@ -335,6 +360,7 @@ class Show extends Component<IProps, IState> {
                                         </FormText>
                                     }
                                 </FormGroup>
+                                {showImages}
                                 <Button className="purple-button"
                                         disabled={!this.state.isEnabled}>
                                     Edit the note

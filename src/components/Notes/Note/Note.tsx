@@ -99,10 +99,10 @@ class Note extends Component<IProps, IState> {
                     <div className="note-event">
                         {
                             this.props.homepage ? (
-                                <Link to={`/show/${note.id}`} title={note.title} className="icon see" />
+                                <Link to={`/show/${note.id}`} title="Show note" className="icon see" />
                             ) : null
                         }
-                        <Link to={`/edit/${note.id}`} title={note.title} className="icon edit" />
+                        <Link to={`/edit/${note.id}`} title="Edit" className="icon edit" />
                         {
                             this.props.homepage ? null : (
                                 <div className="icon print" onClick={() => window.print()} />
