@@ -3,6 +3,7 @@ import { RTAction, RTDispatch } from '../../roots';
 import { Action } from 'redux';
 import { NOTES } from '../../configs';
 import { MNote } from '../../models/notes';
+import CryptoJS, { DecryptedMessage } from 'crypto-js';
 
 export interface ActionEditNote extends Action<string> {}
 
@@ -21,13 +22,21 @@ export const clearEditNote = (): ActionEditNote => ({
 export const editNote = (id: number, note: MNote): RTAction<void> => (dispatch: RTDispatch) => {
     const storage = window.localStorage;
     if (storage) {
-        const notes: MNote[] = JSON.parse(storage.getItem(NOTES));
-        const filteredArray: MNote[] = notes.filter(note => note.id !== id);
-        let newNote: string;
-        filteredArray.push(note);
-        newNote = JSON.stringify(filteredArray);
-        localStorage.setItem(NOTES, newNote);
-        dispatch(editNoteSuccess());
+        const getItem: string = storage.getItem(NOTES);
+        if (getItem) {
+            const bytes: DecryptedMessage = CryptoJS.AES.decrypt(getItem, 'jeremy');
+            const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
+            const notes: MNote[] = JSON.parse(originalText);
+            const filteredArray: MNote[] = notes.filter(note => note.id !== id);
+            let newNote: string;
+            filteredArray.push(note);
+            newNote = JSON.stringify(filteredArray);
+            newNote = CryptoJS.AES.encrypt(newNote, 'jeremy').toString();
+            localStorage.setItem(NOTES, newNote);
+            dispatch(editNoteSuccess());
+        } else {
+            return null;
+        }
     } else {
         dispatch(editNoteFailure());
     }

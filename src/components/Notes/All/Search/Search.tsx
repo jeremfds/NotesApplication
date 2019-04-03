@@ -3,6 +3,7 @@ import { Form, FormGroup, Input, Button } from 'reactstrap';
 import { MNote } from '../../../../models/notes';
 import { IRootState, RTDispatch } from '../../../../roots';
 import { connect } from 'react-redux';
+import CryptoJS, { DecryptedMessage } from 'crypto-js';
 import { NOTES } from '../../../../configs';
 import { deleteAllNotes, clearDeleteAllNotes } from '../../../../actions/notes/actionDeleteAllNotes';
 import './Search.scss';
@@ -50,15 +51,21 @@ class Search extends Component<IProps, IState> {
     }
 
     resetSearch(): void {
-        const notes: MNote[] = JSON.parse(window.localStorage.getItem(NOTES));
-        this.setState({
-            search: {
-                text: '',
-                type: '',
-                priority: '',
-                sort: 'Recent'
-            }
-        }, () =>  this.props.searchNotes(notes));
+        const getItem: string = window.localStorage.getItem(NOTES);
+        if (getItem) {
+            const bytes: DecryptedMessage = CryptoJS.AES.decrypt(getItem, 'jeremy');
+            const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
+            const notes: MNote[] = JSON.parse(originalText);
+            this.setState({
+                search: {
+                    text: '',
+                    type: '',
+                    priority: '',
+                    sort: 'Recent'
+                }
+            }, () =>  this.props.searchNotes(notes));
+        }
+        return null;
     }
 
     applySearch(timeout: number): void {
@@ -101,16 +108,22 @@ class Search extends Component<IProps, IState> {
     }
 
     search(): void {
-        const notes: MNote[] = JSON.parse(window.localStorage.getItem(NOTES));
-        const search: ISearch = this.state.search;
-        if (search.text) {
-            const filter: MNote[] = notes.filter(
-                note => note.text.toUpperCase().includes(search.text.toUpperCase()) ||
-                    note.title.toUpperCase().includes(search.text.toUpperCase()));
-            this.setState({notes: filter}, () => this.searchPriority(500));
-        } else {
-            this.setState({notes: notes}, () => this.searchPriority(500));
+        const getItem: string = window.localStorage.getItem(NOTES);
+        if (getItem) {
+            const bytes: DecryptedMessage = CryptoJS.AES.decrypt(getItem, 'jeremy');
+            const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
+            const notes: MNote[] = JSON.parse(originalText);
+            const search: ISearch = this.state.search;
+            if (search.text) {
+                const filter: MNote[] = notes.filter(
+                    note => note.text.toUpperCase().includes(search.text.toUpperCase()) ||
+                        note.title.toUpperCase().includes(search.text.toUpperCase()));
+                this.setState({notes: filter}, () => this.searchPriority(500));
+            } else {
+                this.setState({notes: notes}, () => this.searchPriority(500));
+            }
         }
+        return null;
     }
 
     onChange(event: ChangeEvent<HTMLInputElement>): void {

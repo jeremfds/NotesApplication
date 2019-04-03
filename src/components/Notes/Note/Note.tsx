@@ -1,6 +1,7 @@
 import React, { Component, ReactNode } from 'react';
 import { Card, CardHeader, CardBody, CardFooter, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { connect } from 'react-redux';
+import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
@@ -47,7 +48,7 @@ class Note extends Component<IProps, IState> {
     }
 
     clickedOnRemove(id: number): void {
-        if (!isNaN(id)) {
+        if (!isNaN(id) && id === this.props.note.id) {
             this.setState(prevState => ({
                 modal: !prevState.modal
             }), () => this.props.deleteNote(id));
@@ -68,8 +69,9 @@ class Note extends Component<IProps, IState> {
                 </CardHeader>
                 <CardBody>
                     {
-                        note.text.length < 255 ? note.text : this.props.homepage ?
-                            `${note.text.substr(0, 255)}...` : note.text
+                        note.text.length < 255 ? <ReactMarkdown source={note.text} /> : this.props.homepage ?
+                            <ReactMarkdown source={`${note.text.substr(0, 255)}...`} /> :
+                            <ReactMarkdown source={note.text} />
                     }
                 </CardBody>
                 <CardFooter>

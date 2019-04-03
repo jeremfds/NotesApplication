@@ -7,6 +7,7 @@ import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
 import {Redirect, RouteComponentProps} from 'react-router';
 import Note from '../Note';
+import CryptoJS, { DecryptedMessage } from 'crypto-js';
 import './Show.scss';
 
 interface IMatch  {
@@ -49,10 +50,17 @@ class Show extends Component<IProps, IState> {
         if (isNaN(id)) {
             this.props.history.push('/');
         } else {
-            const notes: MNote[] = JSON.parse(window.localStorage.getItem(NOTES));
-            if (notes !== null) {
-                if (notes.some(note => note.id === id)) {
-                    this.props.showNote(id);
+            const getItem: string = window.localStorage.getItem(NOTES);
+            if (getItem) {
+                const bytes: DecryptedMessage = CryptoJS.AES.decrypt(getItem, 'jeremy');
+                const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
+                const notes: MNote[] = JSON.parse(originalText);
+                if (notes !== null) {
+                    if (notes.some(note => note.id === id)) {
+                        this.props.showNote(id);
+                    } else {
+                        this.props.history.push('/');
+                    }
                 } else {
                     this.props.history.push('/');
                 }

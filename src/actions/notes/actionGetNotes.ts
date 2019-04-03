@@ -3,6 +3,7 @@ import { RTAction, RTDispatch } from '../../roots';
 import { Action } from 'redux';
 import { NOTES } from '../../configs';
 import { MNote } from '../../models/notes';
+import CryptoJS, { DecryptedMessage } from 'crypto-js';
 
 export interface ActionGetNotes extends Action<string> {
     notes?: MNote[];
@@ -28,11 +29,14 @@ export const clearGetNotes = (): ActionGetNotes => ({
 export const getNotes = (): RTAction<void> => (dispatch: RTDispatch) => {
     const storage = window.localStorage;
     if (storage) {
-        const notes: MNote[] = JSON.parse(storage.getItem(NOTES));
-        if (notes === null || Array.empty(notes)) {
-            dispatch(getNotesEmpty());
-        } else {
+        const getItem: string = storage.getItem(NOTES);
+        if (getItem) {
+            const bytes: DecryptedMessage = CryptoJS.AES.decrypt(getItem, 'jeremy');
+            const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
+            const notes: MNote[] = JSON.parse(originalText);
             dispatch(getNotesArray(notes));
+        } else {
+            dispatch(getNotesEmpty());
         }
     } else {
         dispatch(getNotesFailure());

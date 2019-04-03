@@ -23,6 +23,7 @@ import { MNote } from '../../../models/notes';
 import { MErrors } from '../../../models/utils';
 import { IRootState, RTDispatch } from '../../../roots';
 import { RouteComponentProps} from 'react-router';
+import CryptoJS, { DecryptedMessage } from 'crypto-js';
 
 interface IMatch  {
     id?: string;
@@ -78,10 +79,17 @@ class Show extends Component<IProps, IState> {
         if (isNaN(id)) {
             this.props.history.push('/');
         } else {
-            const notes: MNote[] = JSON.parse(window.localStorage.getItem(NOTES));
-            if (notes !== null) {
-                if (notes.some(note => note.id === id)) {
-                    this.props.showNote(id);
+            const getItem: string = window.localStorage.getItem(NOTES);
+            if (getItem) {
+                const bytes: DecryptedMessage = CryptoJS.AES.decrypt(getItem, 'jeremy');
+                const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
+                const notes: MNote[] = JSON.parse(originalText);
+                if (notes !== null) {
+                    if (notes.some(note => note.id === id)) {
+                        this.props.showNote(id);
+                    } else {
+                        this.props.history.push('/');
+                    }
                 } else {
                     this.props.history.push('/');
                 }

@@ -3,6 +3,7 @@ import { RTAction, RTDispatch } from '../../roots';
 import { Action } from 'redux';
 import { NOTES } from '../../configs';
 import { MNote } from '../../models/notes';
+import CryptoJS, { DecryptedMessage } from 'crypto-js';
 
 export interface ActionShowNote extends Action<string> {
     note?: MNote
@@ -24,10 +25,17 @@ export const clearShowNote = (): ActionShowNote => ({
 export const showNote = (id: number): RTAction<void> => (dispatch: RTDispatch) => {
     const storage = window.localStorage;
     if (storage) {
-        const notes: MNote[] = JSON.parse(storage.getItem(NOTES));
-        const filteredArray: MNote[] = notes.filter(note => note.id === id);
-        const note: MNote = filteredArray[0];
-        dispatch(showNoteSuccess(note));
+        const getItem: string = storage.getItem(NOTES);
+        if (getItem) {
+            const bytes: DecryptedMessage = CryptoJS.AES.decrypt(storage.getItem(NOTES), 'jeremy');
+            const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
+            const notes: MNote[] = JSON.parse(originalText);
+            const filteredArray: MNote[] = notes.filter(note => note.id === id);
+            const note: MNote = filteredArray[0];
+            dispatch(showNoteSuccess(note));
+        } else {
+            return null;
+        }
     } else {
         dispatch(showNoteFailure());
     }

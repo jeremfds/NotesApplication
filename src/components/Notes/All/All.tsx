@@ -80,7 +80,7 @@ class All extends Component<IProps, IState> {
     }
 
     hasDeleted(): void {
-        this.setState({isLoading: true});
+        this.setState({isLoading: true, searched: false});
         setTimeout(() => this.props.getNotes(), 300);
     }
 
