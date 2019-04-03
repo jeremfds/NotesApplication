@@ -23,23 +23,22 @@ export const createNote = (note: MNote): RTAction<void> => (dispatch: RTDispatch
     const storage = window.localStorage;
     if (storage) {
         const getItem: string = storage.getItem(NOTES);
+        let newNote: string;
         if (getItem) {
             const bytes: DecryptedMessage = CryptoJS.AES.decrypt(getItem, 'jeremy');
             const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
             const notes: MNote[] = JSON.parse(originalText);
-            let newNote: string;
-            if (notes === null || Array.empty(notes)) {
-                newNote = JSON.stringify([note]);
-            } else {
-                const id: number = Math.max.apply(Math, notes.map((note => note.id)));
-                notes.push({...note, id: id + 1});
-                newNote = JSON.stringify(notes);
-            }
+            const id: number = Math.max.apply(Math, notes.map((note => note.id)));
+            notes.push({...note, id: id + 1});
+            newNote = JSON.stringify(notes);
             newNote = CryptoJS.AES.encrypt(newNote, 'jeremy').toString();
             localStorage.setItem(NOTES, newNote);
             dispatch(createNoteSuccess());
         } else {
-            return null;
+            newNote = JSON.stringify([note]);
+            newNote = CryptoJS.AES.encrypt(newNote, 'jeremy').toString();
+            localStorage.setItem(NOTES, newNote);
+            dispatch(createNoteSuccess());
         }
     } else {
         dispatch(createNoteFailure());

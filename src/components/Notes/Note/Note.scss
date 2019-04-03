@@ -69,6 +69,14 @@
       padding: 1.5rem;
       border-radius: 0 0 0.5rem 0.5rem;
       text-align: justify;
+      .image-display-container {
+        position: relative;
+        width: 100%;
+        img {
+          max-width: 12.5rem;
+          margin: 0.625rem;
+        }
+      }
     }
     .card-footer {
       background-color: $white;
@@ -77,15 +85,33 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      .show-type-name {
-        &.work {
-          color: $purple-light;
+      .note-information {
+        display: flex;
+        align-items: center;
+        .show-type-name {
+          &.work {
+            color: $purple-light;
+          }
+
+          &.other {
+            color: $green-light;
+          }
+
+          &.personal {
+            color: $blue-light;
+          }
         }
-        &.other {
-          color: $green-light;
-        }
-        &.personal {
-          color: $blue-light;
+        .icon {
+          width: 3rem;
+          height: 1.563rem;
+          margin-left: 1rem;
+          display: flex;
+          align-items: center;
+          color: $blue;
+          &.image {
+            background: url("../../../../assets/images/image.svg") no-repeat center;
+            background-size: contain;
+          }
         }
       }
       .note-event {

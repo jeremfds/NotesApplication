@@ -111,7 +111,6 @@ class All extends Component<IProps, IState> {
                 </Container>
             )
         }
-
         const notes: MNote[] = this.state.notes.reverse();
         if (Array.empty(notes) && !this.state.searched) {
             return (

@@ -6,5 +6,5 @@ export interface MNote {
     priority?: string;
     date?: string;
     version?: number;
-    image?: string;
+    images?: string[];
 }

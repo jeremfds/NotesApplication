@@ -33,6 +33,7 @@ interface IProps {
 interface IState {
     note: MNote;
     errors: MErrors;
+    imagesNumber: number;
     isEnabled: boolean;
     isLoading: boolean;
 }
@@ -48,19 +49,23 @@ class Create extends Component<IProps, IState> {
                 type: '',
                 priority: '',
                 date: 'date',
-                version: 1
+                version: 1,
+                images: []
             },
             errors: {
                 title: '',
                 text: '',
                 type: '',
-                priority: ''
+                priority: '',
+                image: ''
             },
+            imagesNumber: 0,
             isEnabled: false,
             isLoading: false
         };
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.onChangeImage = this.onChangeImage.bind(this);
     }
 
     componentDidUpdate(prevProps: IProps): void {
@@ -139,12 +144,53 @@ class Create extends Component<IProps, IState> {
         this.setState({errors: errors}, () => this.validateForm());
     }
 
+    validateImage(name: string, file: File): boolean {
+        let errors: MErrors = this.state.errors;
+        if (name === 'image') {
+            if (['image/x-png', 'image/jpg', 'image/png', 'image/jpeg'].indexOf(file.type) === -1) {
+                errors[name] = 'Image of type .png, .jpg, .jpeg only';
+                this.setState({errors: errors});
+                return false;
+            } else if (file.size > 2097152) {
+                errors[name] = 'Image size max 3 MB';
+                this.setState({errors: errors});
+                return false;
+            } else {
+                errors[name] = '';
+                this.setState({errors: errors});
+                return true;
+            }
+        }
+        return false;
+    }
+
     onChange(event: ChangeEvent<HTMLInputElement>): void {
         const field: string = event.target.name;
         const note: MNote = this.state.note;
         const value: string = event.target.value;
         note[field] = value;
         this.setState({note: note}, () => this.validateField(field, value));
+    }
+
+    getBase64 = (file: File): Promise<any> => {
+        return new Promise((resolve: any , reject: any) => {
+            const reader: any = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error: string) => reject(error);
+            reader.readAsDataURL(file);
+        });
+    };
+
+    onChangeImage(event: ChangeEvent<HTMLInputElement>): void {
+        const file: File = event.target.files[0];
+        const note: MNote = this.state.note;
+        this.getBase64(file).then(base64 => {
+            const checkFile: boolean = this.validateImage('image', file);
+            if (checkFile) {
+                this.setState({imagesNumber: this.state.imagesNumber + 1},
+                    () => note.images.push(base64.toString()));
+            }
+        });
     }
 
     onSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -218,7 +264,7 @@ class Create extends Component<IProps, IState> {
                             {alertSuccessCreatedNote}
                             <Form onSubmit={this.onSubmit}>
                                 <FormGroup>
-                                    <Label for="title">Title</Label>
+                                    <Label for="title">Title <span className="red-color">*</span></Label>
                                     <Input type="text"
                                            name="title"
                                            id="title"
@@ -236,7 +282,7 @@ class Create extends Component<IProps, IState> {
                                     }
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="text">Text</Label>
+                                    <Label for="text">Text <span className="red-color">*</span></Label>
                                     <Input type="textarea"
                                            name="text"
                                            id="text"
@@ -254,7 +300,7 @@ class Create extends Component<IProps, IState> {
                                     }
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="type">Type</Label>
+                                    <Label for="type">Type <span className="red-color">*</span></Label>
                                     <Input type="select"
                                            name="type"
                                            id="type"
@@ -279,7 +325,7 @@ class Create extends Component<IProps, IState> {
                                     }
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="priority">Priority</Label>
+                                    <Label for="priority">Priority <span className="red-color">*</span></Label>
                                     <Input type="select"
                                            name="priority"
                                            id="priority"
@@ -303,6 +349,29 @@ class Create extends Component<IProps, IState> {
                                         </FormText>
                                     }
                                 </FormGroup>
+                                <FormGroup>
+                                    <Label for="images">Images</Label>
+                                    <Input type="file"
+                                           id="images"
+                                           name="images"
+                                           onChange={this.onChangeImage}
+                                    />
+                                    {
+                                        this.state.errors.image &&
+                                        <FormText color="danger">
+                                            {this.state.errors.image}
+                                        </FormText>
+                                    }
+                                    <span className="number-images">
+                                        {
+                                            this.state.imagesNumber < 2 ? `${this.state.imagesNumber} image`:
+                                                `${this.state.imagesNumber} images`
+                                        }
+                                    </span>
+                                </FormGroup>
+                                <p>
+                                    <span className="red-color">*</span> required
+                                </p>
                                 <Button className="purple-button"
                                         disabled={!this.state.isEnabled}>
                                     Create the note

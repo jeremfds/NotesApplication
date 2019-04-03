@@ -73,9 +73,29 @@ class Note extends Component<IProps, IState> {
                             <ReactMarkdown source={`${note.text.substr(0, 255)}...`} /> :
                             <ReactMarkdown source={note.text} />
                     }
+                    {
+                        this.props.homepage ? null :
+                            note.images.length > 0 ?
+                                <div className="image-display-container">
+                                    {
+                                        note.images.map((image: string, index: number) => {
+                                            return <img key={index} src={image} alt="image" />
+                                        })
+                                    }
+                                </div> : null
+                    }
                 </CardBody>
                 <CardFooter>
-                    <span className={`show-type-name ${note.type.toLowerCase()}`}>{note.type}</span>
+                    <div className="note-information">
+                        <span className={`show-type-name ${note.type.toLowerCase()}`}>{note.type}</span>
+                        {
+                            this.props.homepage ?
+                                note.images.length > 0 ?
+                                    <div className="icon image">{note.images.length}</div>
+                                    : null
+                                : null
+                        }
+                    </div>
                     <div className="note-event">
                         {
                             this.props.homepage ? (
