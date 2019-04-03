@@ -73,7 +73,8 @@ class Create extends Component<IProps, IState> {
             if (prevProps.success !== this.props.success) {
                 setTimeout(() =>
                     this.setState({
-                        note: { id: 0, title: '', text: '', type: '', priority: '', date: 'date', version: 1 },
+                        note: { id: 0, title: '', text: '', type: '', priority: '', date: 'date', version: 1, images: [] },
+                        imagesNumber: 0,
                         isLoading: false,
                         isEnabled: false
                 }), 300);
