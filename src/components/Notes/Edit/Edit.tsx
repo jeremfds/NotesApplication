@@ -149,8 +149,8 @@ class Show extends Component<IProps, IState> {
                     errors[name] = 'Can\'t be blank';
                 } else if (value.length < 5) {
                     errors[name] = 'Too short. 5 characters min.';
-                } else if (value.length > 500) {
-                    errors[name] = 'Too long. 500 characters max.';
+                } else if (value.length > 1000) {
+                    errors[name] = 'Too long. 1000 characters max.';
                 } else {
                     errors[name] = '';
                 }
@@ -274,9 +274,9 @@ class Show extends Component<IProps, IState> {
                                            id="text"
                                            value={note.text}
                                            onChange={this.onChange}
-                                           valid={note.text.length >= 5 && note.text.length <= 500}
+                                           valid={note.text.length >= 5 && note.text.length <= 1000}
                                            invalid={note.text.length < 5 && this.state.errors.text.length > 0
-                                           || note.text.length > 500}
+                                           || note.text.length > 1000}
                                     />
                                     {
                                         this.state.errors.text &&
