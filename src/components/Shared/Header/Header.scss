@@ -3,6 +3,9 @@
 header {
   background-color: $grey;
   border-bottom: 2px solid $grey-light;
+  @media print {
+    display: none;
+  }
   .navbar {
     padding: 1rem;
     .navbar-brand {

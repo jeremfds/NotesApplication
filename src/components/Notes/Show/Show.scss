@@ -1,5 +1,16 @@
 @import '../../Colors';
 
 .note-details {
-
+  @media print {
+    width: 100%;
+    max-width: 100%;
+  }
+  .for-print {
+    @media print {
+      width: 100%;
+      max-width: 100%;
+      flex: auto;
+      margin: 0;
+    }
+  }
 }

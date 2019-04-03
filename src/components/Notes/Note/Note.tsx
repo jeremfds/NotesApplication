@@ -81,6 +81,11 @@ class Note extends Component<IProps, IState> {
                             ) : null
                         }
                         <Link to={`/edit/${note.id}`} title={note.title} className="icon edit" />
+                        {
+                            this.props.homepage ? null : (
+                                <div className="icon print" onClick={() => window.print()} />
+                            )
+                        }
                         <div className="icon delete" onClick={this.toggleModal} />
                         <Modal isOpen={this.state.modal} toggle={this.toggleModal}>
                             <ModalHeader toggle={this.toggleModal}>Are you sure ?</ModalHeader>

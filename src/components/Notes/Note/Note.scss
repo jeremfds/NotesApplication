@@ -1,6 +1,11 @@
 @import '../../Colors';
 
 .show-note {
+  @media print {
+    .card > .printable {
+      display: none;
+    }
+  }
   &.card {
     margin: 0 0 1.5rem 0;
     padding: 0;
@@ -86,11 +91,18 @@
       .note-event {
         display: flex;
         justify-content: flex-end;
+        @media print {
+          display: none;
+        }
         .icon {
           width: 1.563rem;
           height: 1.563rem;
           margin: 0 0.313rem;
           cursor: pointer;
+          &.print {
+            background: url("../../../../assets/images/print.svg") no-repeat center;
+            background-size: contain;
+          }
           &.delete {
             background: url("../../../../assets/images/delete.svg") no-repeat center;
           }

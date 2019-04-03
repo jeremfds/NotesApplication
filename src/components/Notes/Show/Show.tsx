@@ -7,6 +7,7 @@ import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
 import {Redirect, RouteComponentProps} from 'react-router';
 import Note from '../Note';
+import './Show.scss';
 
 interface IMatch  {
     id?: string;
@@ -126,9 +127,9 @@ class Show extends Component<IProps, IState> {
         }
 
         return (
-            <Container>
+            <Container className="note-details">
                 <Row>
-                    <Col xs={12} sm={{ size: 8, offset: 2 }}>
+                    <Col xs={12} sm={{ size: 8, offset: 2 }} className="for-print">
                         <h1>Detail of the note</h1>
                         <Note note={note} homepage={false} refreshNotes={this.refreshNotes} />
                     </Col>

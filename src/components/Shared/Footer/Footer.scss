@@ -1,6 +1,9 @@
 @import '../../Colors';
 
 footer.footer {
+  @media print {
+    display: none;
+  }
   .footer-container {
       padding: 0 0 2.5rem;
     p {
