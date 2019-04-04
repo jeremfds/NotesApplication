@@ -2,10 +2,10 @@ import React, { Component, ReactNode } from 'react';
 import { Container, Row, Col, Spinner } from 'reactstrap';
 import { connect } from 'react-redux';
 import { NOTES } from '../../../configs';
-import { showNote } from '../../../actions/notes/actionShowNote';
+import { showNote, clearShowNote } from '../../../actions/notes/actionShowNote';
 import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
-import {Redirect, RouteComponentProps} from 'react-router';
+import { Redirect, RouteComponentProps } from 'react-router';
 import Note from '../Note';
 import CryptoJS, { DecryptedMessage } from 'crypto-js';
 import './Show.scss';
@@ -19,6 +19,7 @@ interface IProps extends RouteComponentProps<IMatch> {
     success: boolean;
     notCompatible: boolean;
     showNote: (id: number) => void;
+    clearShowNote: () => void;
 }
 
 interface IState {
@@ -31,14 +32,7 @@ class Show extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            note: {
-                id: 1,
-                title: '',
-                text: '',
-                type: '',
-                priority: '',
-                date: ''
-            },
+            note: {},
             isLoading: true,
             refreshNotes: false
         };
@@ -70,19 +64,19 @@ class Show extends Component<IProps, IState> {
         }
     }
 
-    static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
-        if (!Object.equals(nextProps.note, prevState.note)) {
-            return {
-                note: nextProps.note
+    componentDidUpdate(prevProps: IProps, prevState: IState): void {
+        if (this.state.isLoading) {
+            if (!Object.equals(prevState.note, this.props.note)) {
+                setTimeout(() => this.setState({
+                    note: this.props.note,
+                    isLoading: false
+                }), 300);
             }
         }
-        return null;
     }
 
-    componentDidUpdate(prevProps: IProps): void {
-        if (this.state.isLoading) {
-            setTimeout(() => this.setState({isLoading: false}), 300);
-        }
+    componentWillUnmount(): void {
+        this.props.clearShowNote();
     }
 
     refreshNotes(makeRefresh: boolean): void {
@@ -155,6 +149,7 @@ interface IStateToProps {
 
 interface IDispatchToProps {
     showNote: (id: number) => void;
+    clearShowNote: () => void;
 }
 
 const mapStateToProps = (state: IRootState): IStateToProps => ({
@@ -164,7 +159,8 @@ const mapStateToProps = (state: IRootState): IStateToProps => ({
 });
 
 const mapDispatchToProps = (dispatch: RTDispatch): IDispatchToProps => ({
-    showNote: (id: number) => dispatch(showNote(id))
+    showNote: (id: number) => dispatch(showNote(id)),
+    clearShowNote: () => dispatch(clearShowNote())
 });
 
 export default connect<IStateToProps, IDispatchToProps, IProps, IRootState>(

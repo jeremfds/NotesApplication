@@ -33,7 +33,8 @@ interface IProps {
 interface IState {
     note: MNote;
     errors: MErrors;
-    imagesNumber: number;
+    totalImages: number;
+    addImage: boolean;
     isEnabled: boolean;
     isLoading: boolean;
 }
@@ -59,26 +60,33 @@ class Create extends Component<IProps, IState> {
                 priority: '',
                 image: ''
             },
-            imagesNumber: 0,
+            totalImages: 0,
+            addImage: false,
             isEnabled: false,
             isLoading: false
         };
         this.onChange = this.onChange.bind(this);
+        this.onClick = this.onClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onChangeImage = this.onChangeImage.bind(this);
     }
 
-    componentDidUpdate(prevProps: IProps): void {
+    componentDidUpdate(prevProps: IProps, prevState: IState): void {
         if (this.state.isLoading) {
-            if (prevProps.success !== this.props.success) {
+            if (this.props.success) {
                 setTimeout(() =>
                     this.setState({
-                        note: { id: 0, title: '', text: '', type: '', priority: '', date: 'date', version: 1, images: [] },
-                        imagesNumber: 0,
+                        note: {
+                            id: 0, title: '', text: '', type: '', priority: '', date: 'date', version: 1, images: []
+                        },
+                        totalImages: 0,
                         isLoading: false,
                         isEnabled: false
                 }), 300);
             }
+        }
+        if (prevState.addImage !== this.state.addImage) {
+            this.setState({note: this.state.note, addImage: false});
         }
     }
 
@@ -188,10 +196,16 @@ class Create extends Component<IProps, IState> {
         this.getBase64(file).then(base64 => {
             const checkFile: boolean = this.validateImage('image', file);
             if (checkFile) {
-                this.setState({imagesNumber: this.state.imagesNumber + 1},
+                this.setState({totalImages: this.state.totalImages + 1, addImage: true},
                     () => note.images.push(base64.toString()));
             }
         });
+    }
+
+    onClick(image: string) {
+        const note: MNote = this.state.note;
+        note.images = note.images.filter(note => note !== image);
+        this.setState({note: note, totalImages: note.images.length});
     }
 
     onSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -201,7 +215,6 @@ class Create extends Component<IProps, IState> {
             const timezone: string = moment.tz.guess() || 'Europe/London';
             const date: Moment = moment.tz(moment().toDate(), timezone);
             note.date = date.format('LLLL');
-            this.props.clearCreateNote();
             this.setState({isLoading: true}, () => this.props.createNote(note));
         }
     }
@@ -249,6 +262,23 @@ class Create extends Component<IProps, IState> {
                 (
                     <Link to={"/"} title="See my new note posted" className="new-note">← See my new posted note</Link>
                 ) : null
+        );
+
+        const showImages: ReactNode = (
+            note.images.length > 0  ?
+                <div className="image-display-container edit">
+                    {
+                        note.images.map((image: string, index: number) => {
+                            return (
+                                <div key={index} className="edit">
+                                    <img src={image}
+                                         alt="image"
+                                         onClick={() => this.onClick(image)} />
+                                </div>
+                            )
+                        })
+                    }
+                </div> : null
         );
 
         return (
@@ -350,6 +380,7 @@ class Create extends Component<IProps, IState> {
                                         </FormText>
                                     }
                                 </FormGroup>
+                                {showImages}
                                 <FormGroup>
                                     <Label for="images">Images</Label>
                                     <Input type="file"
@@ -365,8 +396,8 @@ class Create extends Component<IProps, IState> {
                                     }
                                     <span className="number-images">
                                         {
-                                            this.state.imagesNumber < 2 ? `${this.state.imagesNumber} image`:
-                                                `${this.state.imagesNumber} images`
+                                            this.state.totalImages < 2 ? `${this.state.totalImages} image`:
+                                                `${this.state.totalImages} images`
                                         }
                                     </span>
                                 </FormGroup>

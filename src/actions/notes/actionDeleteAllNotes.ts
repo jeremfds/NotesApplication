@@ -2,7 +2,6 @@ import { DELETE_ALL_NOTES_SUCCESS, DELETE_ALL_NOTES_FAILURE, DELETE_ALL_NOTES_CL
 import { RTAction, RTDispatch } from '../../roots';
 import { Action } from 'redux';
 import { NOTES } from '../../configs';
-import CryptoJS, { WordArray } from 'crypto-js';
 
 export interface ActionDeleteAllNotes extends Action<string> {}
 
@@ -21,9 +20,7 @@ export const clearDeleteAllNotes = (): ActionDeleteAllNotes => ({
 export const deleteAllNotes = (): RTAction<void> => (dispatch: RTDispatch) => {
     const storage = window.localStorage;
     if (storage) {
-        const filteredArray: string = JSON.stringify([]);
-        const cacheString: WordArray | string = CryptoJS.AES.encrypt(filteredArray, 'jeremy').toString();
-        window.localStorage.setItem(NOTES, cacheString);
+        window.localStorage.removeItem(NOTES);
         dispatch(deleteAllNotesSuccess());
     } else {
         dispatch(deleteAllNotesFailure());

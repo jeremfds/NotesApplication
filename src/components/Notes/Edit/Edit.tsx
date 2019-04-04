@@ -44,6 +44,8 @@ interface IProps extends RouteComponentProps<IMatch> {
 interface IState {
     note: MNote;
     errors: MErrors;
+    totalImages: number;
+    addImage: boolean;
     isEnabled: boolean;
     isLoading: boolean;
 }
@@ -68,10 +70,13 @@ class Show extends Component<IProps, IState> {
                 type: '',
                 priority: ''
             },
+            totalImages: 0,
+            addImage: false,
             isEnabled: false,
             isLoading: true
         };
         this.onChange = this.onChange.bind(this);
+        this.onChangeImage = this.onChangeImage.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
@@ -101,19 +106,21 @@ class Show extends Component<IProps, IState> {
         }
     }
 
-    static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
-        if (!Object.equals(nextProps.note, prevState.note)) {
-            return {
-                note: nextProps.note,
-                isEnabled: true
-            }
-        }
-        return null;
-    }
-
-    componentDidUpdate(prevProps: IProps): void {
+    componentDidUpdate(prevProps: IProps, prevState: IState): void {
         if (this.state.isLoading) {
-            setTimeout(() => this.setState({isLoading: false}), 300);
+            if (!Object.equals(prevState.note, this.props.note)) {
+                const total: number = this.props.note.images ? this.props.note.images.length : 0;
+                setTimeout(() => this.setState({
+                    note: this.props.note,
+                    isLoading: false,
+                    totalImages: total,
+                    isEnabled: true
+                }), 300);
+            } else if (this.props.successEditNote) {
+                setTimeout(() => this.setState({isLoading: false}), 300);
+            }
+        } else if (prevState.addImage !== this.state.addImage) {
+            this.setState({note: this.state.note, addImage: false});
         }
     }
 
@@ -181,6 +188,26 @@ class Show extends Component<IProps, IState> {
         this.setState({errors: errors}, () => this.validateForm());
     }
 
+    validateImage(name: string, file: File): boolean {
+        let errors: MErrors = this.state.errors;
+        if (name === 'image') {
+            if (['image/x-png', 'image/jpg', 'image/png', 'image/jpeg'].indexOf(file.type) === -1) {
+                errors[name] = 'Image of type .png, .jpg, .jpeg only';
+                this.setState({errors: errors});
+                return false;
+            } else if (file.size > 2097152) {
+                errors[name] = 'Image size max 3 MB';
+                this.setState({errors: errors});
+                return false;
+            } else {
+                errors[name] = '';
+                this.setState({errors: errors});
+                return true;
+            }
+        }
+        return false;
+    }
+
     onChange(event: ChangeEvent<HTMLInputElement>): void {
         const field: string = event.target.name;
         const note: MNote = this.state.note;
@@ -192,7 +219,28 @@ class Show extends Component<IProps, IState> {
     onClick(image: string) {
         const note: MNote = this.state.note;
         note.images = note.images.filter(note => note !== image);
-        this.setState({note: note});
+        this.setState({note: note, totalImages: note.images.length});
+    }
+
+    getBase64 = (file: File): Promise<any> => {
+        return new Promise((resolve: any , reject: any) => {
+            const reader: any = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error: string) => reject(error);
+            reader.readAsDataURL(file);
+        });
+    };
+
+    onChangeImage(event: ChangeEvent<HTMLInputElement>): void {
+        const file: File = event.target.files[0];
+        const note: MNote = this.state.note;
+        this.getBase64(file).then(base64 => {
+            const checkFile: boolean = this.validateImage('image', file);
+            if (checkFile) {
+                this.setState({totalImages: this.state.totalImages + 1, addImage: true},
+                    () => note.images.push(base64.toString()));
+            }
+        });
     }
 
     onSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -246,7 +294,7 @@ class Show extends Component<IProps, IState> {
         );
 
         const showImages: ReactNode = (
-            note.images.length > 0 ?
+            note.images.length > 0  ?
                 <div className="image-display-container edit">
                     {
                         note.images.map((image: string, index: number) => {
@@ -275,7 +323,7 @@ class Show extends Component<IProps, IState> {
                             {alertSuccessEditNote}
                             <Form onSubmit={this.onSubmit}>
                                 <FormGroup>
-                                    <Label for="title">Title</Label>
+                                    <Label for="title">Title <span className="red-color">*</span></Label>
                                     <Input type="text"
                                            name="title"
                                            id="title"
@@ -293,7 +341,7 @@ class Show extends Component<IProps, IState> {
                                     }
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="text">Text</Label>
+                                    <Label for="text">Text <span className="red-color">*</span></Label>
                                     <Input type="textarea"
                                            name="text"
                                            id="text"
@@ -311,7 +359,7 @@ class Show extends Component<IProps, IState> {
                                     }
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="type">Type</Label>
+                                    <Label for="type">Type <span className="red-color">*</span></Label>
                                     <Input type="select"
                                            name="type"
                                            id="type"
@@ -336,7 +384,7 @@ class Show extends Component<IProps, IState> {
                                     }
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="priority">Priority</Label>
+                                    <Label for="priority">Priority <span className="red-color">*</span></Label>
                                     <Input type="select"
                                            name="priority"
                                            id="priority"
@@ -360,7 +408,30 @@ class Show extends Component<IProps, IState> {
                                         </FormText>
                                     }
                                 </FormGroup>
-                                {showImages}
+                                <FormGroup>
+                                    <Label for="images">Images</Label>
+                                    {showImages}
+                                    <Input type="file"
+                                           id="images"
+                                           name="images"
+                                           onChange={this.onChangeImage}
+                                    />
+                                    {
+                                        this.state.errors.image &&
+                                        <FormText color="danger">
+                                            {this.state.errors.image}
+                                        </FormText>
+                                    }
+                                    <span className="number-images">
+                                        {
+                                            this.state.totalImages < 2 ? `${this.state.totalImages} image`:
+                                                `${this.state.totalImages} images`
+                                        }
+                                    </span>
+                                </FormGroup>
+                                <p>
+                                    <span className="red-color">*</span> required
+                                </p>
                                 <Button className="purple-button"
                                         disabled={!this.state.isEnabled}>
                                     Edit the note
