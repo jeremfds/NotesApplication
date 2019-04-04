@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
 import { deleteNote, clearDeleteNote } from '../../../actions/notes/actionDeleteNote';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import PdfCreator from '../PdfCreator';
 import './Note.scss';
 
 interface IProps {
@@ -19,16 +21,19 @@ interface IProps {
 
 interface IState {
     modal: boolean;
+    click: boolean;
 }
 
 class Note extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            modal: false
+            modal: false,
+            click: false
         };
         this.toggleModal = this.toggleModal.bind(this);
         this.clickedOnRemove = this.clickedOnRemove.bind(this);
+        this.clickOnPdf = this.clickOnPdf.bind(this);
     }
 
     componentDidUpdate(prevProps: IProps): void {
@@ -55,8 +60,23 @@ class Note extends Component<IProps, IState> {
         }
     }
 
+    clickOnPdf(): void {
+        this.setState({click: !this.state.click});
+    }
+
     render(): ReactNode {
         const note: MNote = this.props.note;
+
+        const downloadPdf = (
+            this.state.click ? (
+                <div className="download-link" onClick={this.clickOnPdf}>
+                    <PDFDownloadLink document={<PdfCreator note={note} />} fileName="note.pdf">
+                        {({ loading }) => (loading ? 'Loading' : 'Download')}
+                    </PDFDownloadLink>
+                </div>
+            ) : null
+        );
+
         return (
             <Card className={`show-note ${note.type.toLowerCase()}`}>
                 <CardHeader>
@@ -103,6 +123,8 @@ class Note extends Component<IProps, IState> {
                             ) : null
                         }
                         <Link to={`/edit/${note.id}`} title="Edit" className="icon edit" />
+                        <div className="icon pdf" onClick={this.clickOnPdf} />
+                        {downloadPdf}
                         {
                             this.props.homepage ? null : (
                                 <div className="icon print" onClick={() => window.print()} />

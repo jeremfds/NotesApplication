@@ -77,9 +77,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      @media (max-width: 370px) {
+        flex-direction: column;
+      }
       .note-information {
         display: flex;
         align-items: center;
+        @media (max-width: 370px) {
+          margin-bottom: 1rem;
+        }
         .show-type-name {
           &.work {
             color: $purple-light;
@@ -110,6 +116,18 @@
         @media print {
           display: none;
         }
+        .download-link {
+          display: flex;
+          align-items: center;
+          a {
+            color: #ff7675;
+            text-decoration: none;
+            transition: all .3s;
+            &:hover {
+              color: #FFA4A4;
+            }
+          }
+        }
         .icon {
           width: 1.563rem;
           height: 1.563rem;
@@ -124,6 +142,9 @@
           }
           &.edit {
             background: url("../../../../assets/images/edit.svg") no-repeat center;
+          }
+          &.pdf {
+            background: url("../../../../assets/images/pdf.svg") no-repeat center;
           }
           &.see {
             background: url("../../../../assets/images/see.svg") no-repeat center;
