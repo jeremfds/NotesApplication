@@ -260,7 +260,7 @@ class Create extends Component<IProps, IState> {
         const successCreatedNote: ReactNode = (
             this.props.success ?
                 (
-                    <Link to={"/"} title="See my new note posted" className="new-note">← See my new posted note</Link>
+                    <Link to={"/"} title="See your notes" className="new-note">← See your notes</Link>
                 ) : null
         );
 

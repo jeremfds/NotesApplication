@@ -29,7 +29,7 @@ export const editNote = (id: number, note: MNote): RTAction<void> => (dispatch: 
             const notes: MNote[] = JSON.parse(originalText);
             const filteredArray: MNote[] = notes.filter(note => note.id !== id);
             let newNote: string;
-            filteredArray.push(note);
+            filteredArray.unshift(note);
             newNote = JSON.stringify(filteredArray);
             newNote = CryptoJS.AES.encrypt(newNote, 'jeremy').toString();
             localStorage.setItem(NOTES, newNote);

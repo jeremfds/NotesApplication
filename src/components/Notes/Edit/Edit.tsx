@@ -24,6 +24,7 @@ import { MNote } from '../../../models/notes';
 import { MErrors } from '../../../models/utils';
 import { IRootState, RTDispatch } from '../../../roots';
 import { RouteComponentProps } from 'react-router';
+import {Link} from "react-router-dom";
 
 interface IMatch  {
     id?: string;
@@ -293,6 +294,13 @@ class Show extends Component<IProps, IState> {
                 ) : null
         );
 
+        const successEditNote: ReactNode = (
+            this.props.successEditNote ?
+                (
+                    <Link to={"/"} title="See your notes" className="new-note">← See your notes</Link>
+                ) : null
+        );
+
         const showImages: ReactNode = (
             note.images.length > 0  ?
                 <div className="image-display-container edit">
@@ -319,6 +327,7 @@ class Show extends Component<IProps, IState> {
                 </Row>
                 <Row>
                     <Col xs={12} md={{ size: 6, offset: 3 }}>
+                        {successEditNote}
                         <Card>
                             {alertSuccessEditNote}
                             <Form onSubmit={this.onSubmit}>

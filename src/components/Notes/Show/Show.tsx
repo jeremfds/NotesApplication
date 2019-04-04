@@ -5,7 +5,7 @@ import { NOTES } from '../../../configs';
 import { showNote, clearShowNote } from '../../../actions/notes/actionShowNote';
 import { MNote } from '../../../models/notes';
 import { IRootState, RTDispatch } from '../../../roots';
-import { Redirect, RouteComponentProps } from 'react-router';
+import { RouteComponentProps } from 'react-router';
 import Note from '../Note';
 import CryptoJS, { DecryptedMessage } from 'crypto-js';
 import './Show.scss';
@@ -71,6 +71,8 @@ class Show extends Component<IProps, IState> {
                     note: this.props.note,
                     isLoading: false
                 }), 300);
+            } else if (this.state.refreshNotes) {
+                this.props.history.push('/');
             }
         }
     }
@@ -109,10 +111,6 @@ class Show extends Component<IProps, IState> {
                     </Row>
                 </Container>
             )
-        }
-
-        if (this.state.refreshNotes) {
-            return <Redirect to={'/'} />
         }
 
         const note: MNote = this.state.note;

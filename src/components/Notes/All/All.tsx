@@ -76,7 +76,7 @@ class All extends Component<IProps, IState> {
     }
 
     searchNotes(notes: MNote[]): void {
-        this.setState({notes: notes.reverse(), searched: true, searchLoading: true});
+        this.setState({notes: notes, searched: true, searchLoading: true});
     }
 
     hasDeleted(): void {

@@ -34,7 +34,7 @@ export const getNotes = (): RTAction<void> => (dispatch: RTDispatch) => {
             const bytes: DecryptedMessage = CryptoJS.AES.decrypt(getItem, 'jeremy');
             const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
             const notes: MNote[] = JSON.parse(originalText);
-            dispatch(getNotesArray(notes.reverse()));
+            dispatch(getNotesArray(notes));
         } else {
             dispatch(getNotesEmpty());
         }

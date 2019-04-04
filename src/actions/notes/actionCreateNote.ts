@@ -29,7 +29,7 @@ export const createNote = (note: MNote): RTAction<void> => (dispatch: RTDispatch
             const originalText: string = bytes.toString(CryptoJS.enc.Utf8);
             const notes: MNote[] = JSON.parse(originalText);
             const id: number = Math.max.apply(Math, notes.map((note => note.id)));
-            notes.push({...note, id: id + 1});
+            notes.unshift({...note, id: id + 1});
             newNote = JSON.stringify(notes);
             newNote = CryptoJS.AES.encrypt(newNote, 'jeremy').toString();
             localStorage.setItem(NOTES, newNote);
